@@ -44,7 +44,7 @@ const getNews = async (req, res) => {
       .setID(1)
       .send();
   } catch (err) {
-    console.log("Error getCategories:" + err.message);
+    console.log("Error getNews:" + err.message);
     return new Response(res)
       .setID(0)
       .setStatusCode(500)
@@ -75,7 +75,7 @@ const getNewsByID = async (req, res) => {
     foundCategory.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
     return new Response(res).setResponse(foundCategory).setID(1).send();
   } catch (err) {
-    console.log("Error getCategoryByID:" + err.message);
+    console.log("Error getNewsByID:" + err.message);
     return new Response(res)
       .setID(0)
       .setStatusCode(500)
@@ -87,9 +87,8 @@ const getNewsByID = async (req, res) => {
 const getNewsByFilter = async (req, res) => {
   try {
     const result = [];
-    const name = req.query.name;
+    const title = req.query.title;
     const created_by = req.query.created_by;
-    const description = req.query.description;
 
     // pagination
     let page = parseInt(req.query.page) || 1;
@@ -99,9 +98,8 @@ const getNewsByFilter = async (req, res) => {
 
     const categoryList = await prisma.categories.findMany({
       where: {
-        name: { contains: name },
+        title: { contains: title },
         created_by: created_by,
-        description: { contains: description },
         status: 1,
       },
     });
@@ -136,7 +134,7 @@ const getNewsByFilter = async (req, res) => {
       .setID(1)
       .send();
   } catch (err) {
-    console.log("Error getCategoryByFilter:" + err.message);
+    console.log("Error getNewsByFilter:" + err.message);
     return new Response(res)
       .setID(0)
       .setStatusCode(500)
@@ -148,39 +146,53 @@ const getNewsByFilter = async (req, res) => {
 const addNews = async (req, res) => {
   try {
     const body = req.body;
-    const { name, description, created_by } = body;
+    const {
+      categoryId,
+      authorId,
+      userId,
+      title,
+      image,
+      short_description,
+      content,
+      created_by
+    } = body;
 
-    if (!name) {
+    if (!title) {
       return new Response(res)
         .setID(0)
         .setStatusCode(400)
-        .setMessage("Category name is required.")
+        .setMessage("News title is required.")
         .send();
     }
     const foundCategory = await prisma.categories.findFirst({
-      where: { name: name },
+      where: { name: title },
     });
     if (!foundCategory) {
       await prisma.categories.create({
         data: {
-          name: name,
-          description: description,
+          categoryId: categoryId,
+          authorId: authorId,
+          userId: userId,
+          name: title,
+          image: image,
+          short_description: short_description,
+          content: content,
           created_by: created_by,
         },
       });
       return new Response(res)
         .setID(1)
         .setStatusCode(201)
-        .setMessage("Category created successfully.")
+        .setMessage("News created successfully.")
         .send();
     }
     return new Response(res)
       .setID(0)
       .setStatusCode(400)
-      .setMessage("Category already exist.")
+      .setMessage("News already exist.")
       .send();
   } catch (err) {
-    console.log("Error addCategory:" + err.message);
+    console.log("Error addNews:" + err.message);
     return new Response(res)
       .setID(0)
       .setStatusCode(500)
@@ -192,12 +204,23 @@ const addNews = async (req, res) => {
 const updateNews = async (req, res) => {
   try {
     const body = req.body;
-    const { name, description, id, updated_by } = body;
-    if (!name) {
+    const {
+      id,
+      categoryId,
+      authorId,
+      userId,
+      title,
+      image,
+      short_description,
+      content,
+      created_by
+    } = body;
+
+    if (!title) {
       return new Response(res)
         .setID(0)
         .setStatusCode(400)
-        .setMessage("name is required.")
+        .setMessage("title is required.")
         .send();
     }
 
@@ -214,31 +237,37 @@ const updateNews = async (req, res) => {
     }
 
     const checkRecordExist = await prisma.categories.findFirst({
-      where: { name: name },
+      where: { name: title },
     });
 
     if (checkRecordExist && checkRecordExist?.ID != id) {
       return new Response(res)
         .setID(0)
         .setStatusCode(400)
-        .setMessage("Category already exist.")
+        .setMessage("News already exist.")
         .send();
     } else {
       await prisma.categories.update({
         where: { ID: id },
         data: {
-          name: name,
-          description: description,
-          updated_by: updated_by,
+          ID,
+          categoryId,
+          authorId,
+          userId,
+          title,
+          image,
+          short_description,
+          content,
+          created_by
         },
       });
       return new Response(res)
         .setID(1)
-        .setMessage("Category updated successfully.")
+        .setMessage("News updated successfully.")
         .send();
     }
   } catch (err) {
-    console.log("Error updateCategory:" + err.message);
+    console.log("Error updateNews:" + err.message);
     return new Response(res)
       .setID(0)
       .setStatusCode(500)
@@ -275,10 +304,10 @@ const deleteNews = async (req, res) => {
     });
     return new Response(res)
       .setID(1)
-      .setMessage("Category deleted successfully.")
+      .setMessage("News deleted successfully.")
       .send();
   } catch (err) {
-    console.log("Error deleteCategory:" + err.message);
+    console.log("Error deleteNews:" + err.message);
     return new Response(res)
       .setID(0)
       .setStatusCode(500)
