@@ -1,6 +1,7 @@
 const express = require("express");
 const authorRoutes = express.Router();
 const authorController = require("../controllers/authorController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 authorRoutes.get("/authors", authorController.getAuthors);
 
@@ -8,10 +9,10 @@ authorRoutes.get("/author/:id", authorController.getAuthorByID);
 
 authorRoutes.get("/authors/filter", authorController.getAuthorByFilter);
 
-authorRoutes.post("/author", authorController.addAuthor);
+authorRoutes.post("/author", authMiddleware, authorController.addAuthor);
 
-authorRoutes.put("/author", authorController.updateAuthor);
+authorRoutes.put("/author", authMiddleware, authorController.updateAuthor);
 
-authorRoutes.delete("/author/:id", authorController.deleteAuthor);
+authorRoutes.delete("/author/:id", authMiddleware, authorController.deleteAuthor);
 
 module.exports = authorRoutes;

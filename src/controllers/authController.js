@@ -21,14 +21,14 @@ const login = async (req, res) => {
         if (!foundUser || !bcrypt.compareSync(password, foundUser.password)) {
             return res.status(401).send({ statusCode: 401, message: "User or password incorrect" });
         }
-
+        const user = {
+            ID: foundUser.ID,
+            username: foundUser.username,
+            role: foundUser.role
+        }
         const result = {
-            token: jwtLib.generateToken(foundUser),
-            data: {
-                id: foundUser.ID,
-                username: foundUser.username,
-                role: foundUser.role
-            }
+            token: jwtLib.generateToken(user),
+            data: user
         }
 
         return res.status(200).send({ statusCode: 200, result: result, message: "Login successful" });
