@@ -112,7 +112,7 @@ const getTagByFilter = async (req, res) =>{
 const addTag = async (req, res) => {
     try{ 
         const body = req.body;
-        const { name, created_by } = body;
+        const { name } = body;
        
         if(!name){
             return new Response(res).setID(0).setStatusCode(400).setMessage("Tag name is required.").send();
@@ -123,7 +123,7 @@ const addTag = async (req, res) => {
             await prisma.tags.create({ 
                 data: {
                     name:name, 
-                    created_by:created_by
+                    created_by:req.user.username
                 }, 
             });
             return new Response(res).setID(1).setStatusCode(201).setMessage("Tag created successfully.").send();
@@ -139,7 +139,7 @@ const addTag = async (req, res) => {
 const updateTag = async (req,res) =>{
     try{
         const body = req.body;
-        const { name,id, updated_by } = body;
+        const { name,id } = body;
         if(!name){
             return new Response(res).setID(0).setStatusCode(400).setMessage("name is required.").send();
         }
@@ -159,7 +159,7 @@ const updateTag = async (req,res) =>{
                 where:{ID:id},
                 data:{
                     name : name,
-                    updated_by : updated_by
+                    updated_by : req.user.username
                 }
             });
             return new Response(res).setID(1).setMessage("Tag updated successfully.").send();

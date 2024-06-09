@@ -119,7 +119,8 @@ const getAuthorByFilter = async (req, res) =>{
 const addAuthor = async (req, res) => {
     try{ 
         const body = req.body;
-        const { username,biography, created_by } = body;
+        console.log("login user",req.user);
+        const { username,biography } = body;
        
         if(!username){
             return new Response(res).setID(0).setStatusCode(400).setMessage(" username is required.").send();
@@ -132,7 +133,7 @@ const addAuthor = async (req, res) => {
         if(!foundAuthor){
             const data = {
                 username: username,
-                created_by: created_by
+                created_by: req.user.username
             }
             if (biography) {
                 data.biography = biography;
@@ -151,7 +152,7 @@ const addAuthor = async (req, res) => {
 const updateAuthor = async (req,res) =>{
     try{
         const body = req.body;
-        const { username,biography,id, updated_by } = body;
+        const { username,biography,id } = body;
         if(!username){
             return new Response(res).setID(0).setStatusCode(400).setMessage("username is required.").send();
         }
@@ -174,7 +175,7 @@ const updateAuthor = async (req,res) =>{
                 data:{
                     username : username,
                     biography : biography,
-                    updated_by : updated_by
+                    updated_by : req.user.username
                 }
             });
             return new Response(res).setID(1).setMessage("Author updated successfully.").send();
