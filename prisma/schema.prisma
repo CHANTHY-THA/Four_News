@@ -32,8 +32,23 @@ model Tags {
   updated_by String?
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
+
+  articleTag ArticleTags[]
 }
-model Authors{
+model ArticleTags {
+  ID  Int  @id  @default(autoincrement())
+  newsId Int
+  tagId Int
+  status Int @default(1)
+  created_by String
+  updated_by String?
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  new News @relation(fields: [newsId], references: [ID])
+  tag Tags @relation(fields: [tagId], references: [ID])
+}
+model Authors {
   ID  Int  @id  @default(autoincrement())
   username  String
   biography String?
@@ -64,6 +79,7 @@ model News {
   category Categories @relation(fields: [categoryId], references: [ID])
   author Authors @relation(fields: [authorId], references: [ID])
   user Users @relation(fields: [userId], references: [ID])
+  articleTag ArticleTags[]
 }
 
 model Users {

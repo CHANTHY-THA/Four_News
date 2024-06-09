@@ -10,13 +10,13 @@ const getNews = async (req, res) => {
     let result = [];
     let recordSkip = (page - 1) * limit;
 
-    const totalRecord = await prisma.categories.findMany({
+    const totalRecord = await prisma.News.findMany({
       where: {
         status: 1,
       },
     });
 
-    const totalRecordPerPage = await prisma.categories.findMany({
+    const totalRecordPerPage = await prisma.News.findMany({
       where: { status: 1 },
       skip: recordSkip,
       take: limit,
@@ -40,7 +40,7 @@ const getNews = async (req, res) => {
       has_next: page < total_page,
     };
     return new Response(res)
-      .setResponse({ categories: result, pagination: pagination })
+      .setResponse({ news: result, pagination: pagination })
       .setID(1)
       .send();
   } catch (err) {
@@ -56,24 +56,24 @@ const getNews = async (req, res) => {
 const getNewsByID = async (req, res) => {
   try {
     let id = parseInt(req.params.id);
-    const foundCategory = await prisma.categories.findFirst({
+    const foundNews = await prisma.News.findFirst({
       where: {
         ID: id,
         status: 1,
       },
     });
-    if (!foundCategory) {
+    if (!foundNews) {
       return new Response(res)
         .setID(0)
         .setStatusCode(404)
         .setMessage("No data found.")
         .send();
     }
-    const createdAtFormat = dayjs(foundCategory.created_at);
-    const updatedAtFormat = dayjs(foundCategory.updated_at);
-    foundCategory.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
-    foundCategory.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-    return new Response(res).setResponse(foundCategory).setID(1).send();
+    const createdAtFormat = dayjs(foundNews.created_at);
+    const updatedAtFormat = dayjs(foundNews.updated_at);
+    foundNews.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
+    foundNews.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+    return new Response(res).setResponse(foundNews).setID(1).send();
   } catch (err) {
     console.log("Error getNewsByID:" + err.message);
     return new Response(res)
@@ -88,6 +88,7 @@ const getNewsByFilter = async (req, res) => {
   try {
     const result = [];
     const title = req.query.title;
+    const content = req.query.content;
     const created_by = req.query.created_by;
 
     // pagination
@@ -96,24 +97,25 @@ const getNewsByFilter = async (req, res) => {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    const categoryList = await prisma.categories.findMany({
+    const newsList = await prisma.News.findMany({
       where: {
         title: { contains: title },
+        content: content,
         created_by: created_by,
         status: 1,
       },
     });
 
-    if (categoryList.length == 0) {
+    if (newsList.length == 0) {
       return new Response(res)
         .setID(0)
         .setStatusCode(404)
         .setMessage("No data found.")
         .send();
     }
-    const categories = categoryList.slice(startIndex, endIndex);
+    const news = newsList.slice(startIndex, endIndex);
 
-    categories.forEach((cat) => {
+    news.forEach((cat) => {
       const createdAtFormat = dayjs(cat.created_at);
       const updatedAtFormat = dayjs(cat.updated_at);
       cat.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
@@ -164,16 +166,16 @@ const addNews = async (req, res) => {
         .setMessage("News title is required.")
         .send();
     }
-    const foundCategory = await prisma.categories.findFirst({
-      where: { name: title },
+    const foundNews = await prisma.News.findFirst({
+      where: { title: title },
     });
-    if (!foundCategory) {
-      await prisma.categories.create({
+    if (!foundNews) {
+      await prisma.News.create({
         data: {
           categoryId: categoryId,
           authorId: authorId,
           userId: userId,
-          name: title,
+          title: title,
           image: image,
           short_description: short_description,
           content: content,
@@ -224,11 +226,11 @@ const updateNews = async (req, res) => {
         .send();
     }
 
-    const foundCategory = await prisma.categories.findFirst({
+    const foundNews = await prisma.News.findFirst({
       where: { ID: id, status: 1 },
     });
-    console.log("data: " + foundCategory);
-    if (!foundCategory) {
+    console.log("data: " + foundNews);
+    if (!foundNews) {
       return new Response(res)
         .setID(0)
         .setStatusCode(404)
@@ -236,7 +238,7 @@ const updateNews = async (req, res) => {
         .send();
     }
 
-    const checkRecordExist = await prisma.categories.findFirst({
+    const checkRecordExist = await prisma.News.findFirst({
       where: { name: title },
     });
 
@@ -247,10 +249,10 @@ const updateNews = async (req, res) => {
         .setMessage("News already exist.")
         .send();
     } else {
-      await prisma.categories.update({
+      await prisma.News.update({
         where: { ID: id },
         data: {
-          ID,
+          id,
           categoryId,
           authorId,
           userId,
