@@ -148,7 +148,7 @@ const getCategoryByFilter = async (req, res) => {
 const addCategory = async (req, res) => {
   try {
     const body = req.body;
-    const { name, description, created_by } = body;
+    const { name, description } = body;
 
     if (!name) {
       return new Response(res)
@@ -165,7 +165,7 @@ const addCategory = async (req, res) => {
         data: {
           name: name,
           description: description,
-          created_by: created_by,
+          created_by: req.user.username,
         },
       });
       return new Response(res)
@@ -192,7 +192,7 @@ const addCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const body = req.body;
-    const { name, description, id, updated_by } = body;
+    const { name, description, id } = body;
     if (!name) {
       return new Response(res)
         .setID(0)
@@ -229,7 +229,7 @@ const updateCategory = async (req, res) => {
         data: {
           name: name,
           description: description,
-          updated_by: updated_by,
+          updated_by: req.user.username,
         },
       });
       return new Response(res)
