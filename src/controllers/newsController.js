@@ -156,7 +156,6 @@ const addNews = async (req, res) => {
       image,
       short_description,
       content,
-      created_by,
       tagId
     } = body;
 
@@ -180,7 +179,7 @@ const addNews = async (req, res) => {
           image: image,
           short_description: short_description,
           content: content,
-          created_by: created_by,
+          created_by: req.user.username,
         },
       });
 
@@ -225,7 +224,6 @@ const updateNews = async (req, res) => {
       image,
       short_description,
       content,
-      created_by
     } = body;
 
     if (!title) {
@@ -269,7 +267,7 @@ const updateNews = async (req, res) => {
           image,
           short_description,
           content,
-          created_by
+          updated_by: req.user.username
         },
       });
       return new Response(res)
