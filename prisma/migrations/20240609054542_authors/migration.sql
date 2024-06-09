@@ -3,13 +3,12 @@
 
   - You are about to drop the column `name` on the `authors` table. All the data in the column will be lost.
   - You are about to drop the `testing` table. If the table is not empty, all the data it contains will be lost.
-  - Added the required column `biography` to the `authors` table without a default value. This is not possible if the table is not empty.
   - Added the required column `username` to the `authors` table without a default value. This is not possible if the table is not empty.
 
 */
 -- AlterTable
 ALTER TABLE `authors` DROP COLUMN `name`,
-    ADD COLUMN `biography` VARCHAR(191) NOT NULL,
+    ADD COLUMN `biography` VARCHAR(191) NULL,
     ADD COLUMN `username` VARCHAR(191) NOT NULL;
 
 -- DropTable
