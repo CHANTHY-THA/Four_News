@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const dayjs = require('dayjs');
 const prisma = new PrismaClient();
 
-const getTags = async (req, res) => {
+const getAuthors = async (req, res) => {
 
    try{
         let page = parseInt(req.query.page) || 1;
@@ -11,13 +11,13 @@ const getTags = async (req, res) => {
         let result = [];
         let recordSkip = (page - 1) * limit;
        
-        const totalRecord = await prisma.tags.findMany({
+        const totalRecord = await prisma.tag.findMany({
            where:{
             status:1
            }
         });
 
-        const totalRecordPerPage = await prisma.tags.findMany({
+        const totalRecordPerPage = await prisma.tag.findMany({
             where:{status:1},
             skip:recordSkip,
             take:limit,
@@ -43,152 +43,157 @@ const getTags = async (req, res) => {
         return new Response(res).setResponse({tags:result, pagination:pagination}).setID(1).send();
 
     }catch(err){
-        console.log("Error getTags:" + err.message);
+        console.log("Error getAuthors:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
         
     }
 };
 
 
-const getTagByID = async (req, res) => {
+const getAuthorByID = async (req, res) => {
 
     try{
         let id = parseInt(req.params.id);
-        const foundTag = await prisma.tags.findFirst({
+        const foundAuthor = await prisma.tag.findFirst({
             where:{
                 ID:id, 
                 status : 1
             }
         });
-        if(!foundTag){
+        if(!foundAuthor){
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         } 
-        const createdAtFormat = dayjs(foundTag.created_at);
-        const updatedAtFormat = dayjs(foundTag.updated_at);
-        foundTag.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
-        foundTag.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-        return new Response(res).setResponse(foundTag).setID(1).send();
+        const createdAtFormat = dayjs(foundAuthor.created_at);
+        const updatedAtFormat = dayjs(foundAuthor.updated_at);
+        foundAuthor.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
+        foundAuthor.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+        return new Response(res).setResponse(foundAuthor).setID(1).send();
 
      }catch(err){
-        console.log("Error getTagByID:" + err.message);
+        console.log("Error getAuthorByID:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();   
     }
 };
 
-const getTagByFilter = async (req, res) =>{
+const getAuthorByFilter = async (req, res) =>{
 
     try{
         const result = [];
-        const name  = req.query.name;
+        const username  = req.query.username;
         const created_by = req.query.created_by;
         //const {name} = filters;
-        const tagList = await prisma.tags.findMany({
+        const authorList = await prisma.authors.findMany({
             where:{
-                name:{contains : name}, 
+                username:{contains : username}, 
                 created_by: created_by,
                 status : 1
             }
         })
         
-        if(tagList.length == 0){
+        if(authorList.length == 0){
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         }
 
-        tagList.forEach(t => {
+        authorList.forEach(t => {
             const createdAtFormat = dayjs(t.created_at);
             const updatedAtFormat = dayjs(t.updated_at);
             t.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
             t.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
             result.push(t);
         });
-        return new Response(res).setResponse(tagList).setID(1).send();
+        return new Response(res).setResponse(authorList).setID(1).send();
 
     }catch(err){
-        console.log("Error getTagByFilter:" + err.message);
+        console.log("Error getAuthorByFilter:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();   
     }
 }
 
-const addTag = async (req, res) => {
+const addAuthor = async (req, res) => {
     try{ 
         const body = req.body;
-        const { name, created_by } = body;
+        const { username,biography, created_by } = body;
        
-        if(!name){
-            return new Response(res).setID(0).setStatusCode(400).setMessage("Tag name is required.").send();
+        if(!username){
+            return new Response(res).setID(0).setStatusCode(400).setMessage(" username is required.").send();
         }
-        const foundTag = await prisma.tags.findFirst({where:{name:name}});
-        if(!foundTag){
 
-            await prisma.tags.create({ 
+        const foundAuthor = await prisma.authors.findFirst(
+            {where:{username:username}
+        });
+        if(!foundAuthor){
+            await prisma.authors.create({ 
                 data: {
-                    name:name, 
+                    username:username, 
+                    biography:biography, 
                     created_by:created_by
                 }, 
             });
-            return new Response(res).setID(1).setStatusCode(201).setMessage("Tag created successfully.").send();
+            return new Response(res).setID(1).setStatusCode(201).setMessage("Author created successfully.").send();
         }
-        return new Response(res).setID(0).setStatusCode(400).setMessage("Tag already exist.").send();
+        return new Response(res).setID(0).setStatusCode(400).setMessage("Author already exist.").send();
 
     }catch(err){
-        console.log("Error addTag:" + err.message);
+        console.log("Error addAuthor:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
     }  
 };
 
-const updateTag = async (req,res) =>{
+const updateAuthor = async (req,res) =>{
     try{
         const body = req.body;
-        const { name,id, updated_by } = body;
-        if(!name){
-            return new Response(res).setID(0).setStatusCode(400).setMessage("name is required.").send();
+        const { username,biography,id, updated_by } = body;
+        if(!username){
+            return new Response(res).setID(0).setStatusCode(400).setMessage("username is required.").send();
         }
 
-        const foundTag = await prisma.tags.findFirst({where:{ID:id, status:1}});
-        console.log("data: " + foundTag);
-        if(!foundTag){
+        const foundAuthor = await prisma.authors.findFirst({
+            where:{ID:id, status:1}
+        });
+        console.log("data: " + foundAuthor);
+        if(!foundAuthor){
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         }
 
-        const checkRecordExist = await prisma.tags.findFirst({where:{name:name}});
+        const checkRecordExist = await prisma.authors.findFirst({where:{username:username}});
 
         if(checkRecordExist && checkRecordExist?.ID != id){
-            return new Response(res).setID(0).setStatusCode(400).setMessage("Tag already exist.").send();
+            return new Response(res).setID(0).setStatusCode(400).setMessage("Username already exist.").send();
         }else{
-            await prisma.tags.update({
+            await prisma.authors.update({
                 where:{ID:id},
                 data:{
-                    name : name,
+                    usernamename : username,
+                    biography : biography,
                     updated_by : updated_by
                 }
             });
-            return new Response(res).setID(1).setMessage("Tag updated successfully.").send();
+            return new Response(res).setID(1).setMessage("Author updated successfully.").send();
         }
     }catch(err){
-        console.log("Error updateTag:" + err.message);
+        console.log("Error updateAuthor:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
     } 
 }
 
-const deleteTag = async (req,res) =>{
+const deleteAuthor = async (req,res) =>{
     try{
         const id = parseInt(req.params.id);
         if (isNaN(id)) {
             return new Response(res).setID(0).setStatusCode(400).setMessage("ID must be a number.").send;
         }
-        const foundTag = await prisma.tags.findFirst({where:{ID:id, status:1}});
+        const foundAuthor = await prisma.tag.findFirst({where:{ID:id, status:1}});
 
-        if(!foundTag){
+        if(!foundAuthor){
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         }
-        await prisma.tags.update({
+        await prisma.authors.update({
             where: {ID:id},
             data:{
                status:0 
             }
         });
         return new Response(res).setID(1).setMessage("Tag deleted successfully.").send();
-
 
     }catch(err){
         console.log("Error deleteTag:" + err.message);
@@ -198,10 +203,10 @@ const deleteTag = async (req,res) =>{
 
 
 module.exports = {
-    getTags,
-    getTagByID,
-    getTagByFilter,
-    addTag,
-    updateTag,
-    deleteTag
+    getAuthors,
+    getAuthorByID,
+    getAuthorByFilter,
+    addAuthor,
+    updateAuthor,
+    deleteAuthor
 };

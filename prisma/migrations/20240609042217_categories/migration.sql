@@ -1,7 +1,8 @@
 -- CreateTable
-CREATE TABLE `Tag` (
+CREATE TABLE `categories` (
     `ID` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
+    `description` TEXT NULL,
     `status` INTEGER NOT NULL DEFAULT 1,
     `created_by` VARCHAR(191) NOT NULL,
     `updated_by` VARCHAR(191) NULL,

@@ -10,13 +10,13 @@ const getCategories = async (req, res) => {
     let result = [];
     let recordSkip = (page - 1) * limit;
 
-    const totalRecord = await prisma.category.findMany({
+    const totalRecord = await prisma.categories.findMany({
       where: {
         status: 1,
       },
     });
 
-    const totalRecordPerPage = await prisma.category.findMany({
+    const totalRecordPerPage = await prisma.categories.findMany({
       where: { status: 1 },
       skip: recordSkip,
       take: limit,
@@ -56,7 +56,7 @@ const getCategories = async (req, res) => {
 const getCategoryByID = async (req, res) => {
   try {
     let id = parseInt(req.params.id);
-    const foundCategory = await prisma.category.findFirst({
+    const foundCategory = await prisma.categories.findFirst({
       where: {
         ID: id,
         status: 1,
@@ -97,7 +97,7 @@ const getCategoryByFilter = async (req, res) => {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    const categoryList = await prisma.category.findMany({
+    const categoryList = await prisma.categories.findMany({
       where: {
         name: { contains: name },
         created_by: created_by,
@@ -157,11 +157,11 @@ const addCategory = async (req, res) => {
         .setMessage("Category name is required.")
         .send();
     }
-    const foundCategory = await prisma.category.findFirst({
+    const foundCategory = await prisma.categories.findFirst({
       where: { name: name },
     });
     if (!foundCategory) {
-      await prisma.category.create({
+      await prisma.categories.create({
         data: {
           name: name,
           description: description,
@@ -201,7 +201,7 @@ const updateCategory = async (req, res) => {
         .send();
     }
 
-    const foundCategory = await prisma.category.findFirst({
+    const foundCategory = await prisma.categories.findFirst({
       where: { ID: id, status: 1 },
     });
     console.log("data: " + foundCategory);
@@ -213,7 +213,7 @@ const updateCategory = async (req, res) => {
         .send();
     }
 
-    const checkRecordExist = await prisma.category.findFirst({
+    const checkRecordExist = await prisma.categories.findFirst({
       where: { name: name },
     });
 
@@ -224,7 +224,7 @@ const updateCategory = async (req, res) => {
         .setMessage("Category already exist.")
         .send();
     } else {
-      await prisma.category.update({
+      await prisma.categories.update({
         where: { ID: id },
         data: {
           name: name,
@@ -256,7 +256,7 @@ const deleteCategory = async (req, res) => {
         .setStatusCode(400)
         .setMessage("ID must be a number.").send;
     }
-    const foundCategory = await prisma.category.findFirst({
+    const foundCategory = await prisma.categories.findFirst({
       where: { ID: id, status: 1 },
     });
 
@@ -267,7 +267,7 @@ const deleteCategory = async (req, res) => {
         .setMessage("No data found.")
         .send();
     }
-    await prisma.category.update({
+    await prisma.categories.update({
       where: { ID: id },
       data: {
         status: 0,

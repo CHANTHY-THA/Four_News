@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Category {
+model categories {
   ID  Int  @id  @default(autoincrement())
   name  String
   description  String? @db.Text
@@ -23,8 +23,7 @@ model Category {
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }
-
-model Tag {
+model tags {
   ID  Int  @id  @default(autoincrement())
   name  String
   status Int @default(1)
@@ -33,3 +32,18 @@ model Tag {
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }
+model authors{
+  ID  Int  @id  @default(autoincrement())
+  username  String
+  biography String
+  status Int @default(1)
+  created_by String
+  updated_by String?
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+}
+
+
+
+
+
