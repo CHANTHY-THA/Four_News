@@ -42,7 +42,7 @@ model authors{
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }
-model News {
+model news {
   ID  Int  @id  @default(autoincrement())
   title  String
   image  String
@@ -54,6 +54,8 @@ model News {
   publish_date DateTime @default(now())
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
+
+  
 }
 
 
