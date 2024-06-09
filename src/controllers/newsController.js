@@ -156,7 +156,8 @@ const addNews = async (req, res) => {
       image,
       short_description,
       content,
-      created_by
+      created_by,
+      tagId
     } = body;
 
     if (!title) {
@@ -170,7 +171,7 @@ const addNews = async (req, res) => {
       where: { title: title },
     });
     if (!foundNews) {
-      await prisma.News.create({
+      const news = await prisma.News.create({
         data: {
           categoryId: categoryId,
           authorId: authorId,
@@ -182,6 +183,15 @@ const addNews = async (req, res) => {
           created_by: created_by,
         },
       });
+
+      await prisma.NewsTags.create({
+        data: {
+          newsId: news.ID,
+          tagId: tagId,
+          created_by: news.created_by,
+        },
+      });
+
       return new Response(res)
         .setID(1)
         .setStatusCode(201)
@@ -239,7 +249,7 @@ const updateNews = async (req, res) => {
     }
 
     const checkRecordExist = await prisma.News.findFirst({
-      where: { name: title },
+      where: { title: title },
     });
 
     if (checkRecordExist && checkRecordExist?.ID != id) {
@@ -252,7 +262,6 @@ const updateNews = async (req, res) => {
       await prisma.News.update({
         where: { ID: id },
         data: {
-          id,
           categoryId,
           authorId,
           userId,
@@ -287,18 +296,18 @@ const deleteNews = async (req, res) => {
         .setStatusCode(400)
         .setMessage("ID must be a number.").send;
     }
-    const foundCategory = await prisma.categories.findFirst({
+    const foundNews = await prisma.News.findFirst({
       where: { ID: id, status: 1 },
     });
 
-    if (!foundCategory) {
+    if (!foundNews) {
       return new Response(res)
         .setID(0)
         .setStatusCode(404)
         .setMessage("No data found.")
         .send();
     }
-    await prisma.categories.update({
+    await prisma.News.update({
       where: { ID: id },
       data: {
         status: 0,

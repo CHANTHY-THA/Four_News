@@ -33,9 +33,9 @@ model Tags {
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 
-  articleTag ArticleTags[]
+  articleTag NewsTags[]
 }
-model ArticleTags {
+model NewsTags {
   ID  Int  @id  @default(autoincrement())
   newsId Int
   tagId Int
@@ -79,7 +79,7 @@ model News {
   category Categories @relation(fields: [categoryId], references: [ID])
   author Authors @relation(fields: [authorId], references: [ID])
   user Users @relation(fields: [userId], references: [ID])
-  articleTag ArticleTags[]
+  articleTag NewsTags[]
 }
 
 model Users {

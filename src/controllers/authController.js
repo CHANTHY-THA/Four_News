@@ -23,7 +23,7 @@ const login = async (req, res) => {
         }
 
         const result = {
-            token: jwtLib.generateToken(foundUser.ID),
+            token: jwtLib.generateToken(foundUser),
             data: {
                 id: foundUser.ID,
                 username: foundUser.username,
@@ -44,8 +44,10 @@ const login = async (req, res) => {
 
 const getUser = async (req, res) => {
 
+    console.log(res.user);
+    
     try {
-        const loginId = req.userId;
+        const loginId = req.user.ID;
         const foundUser = await prisma.users.findUnique({
             where: { ID: loginId }
         });
