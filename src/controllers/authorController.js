@@ -11,13 +11,13 @@ const getAuthors = async (req, res) => {
         let result = [];
         let recordSkip = (page - 1) * limit;
        
-        const totalRecord = await prisma.tag.findMany({
+        const totalRecord = await prisma.authors.findMany({
            where:{
             status:1
            }
         });
 
-        const totalRecordPerPage = await prisma.tag.findMany({
+        const totalRecordPerPage = await prisma.authors.findMany({
             where:{status:1},
             skip:recordSkip,
             take:limit,
@@ -54,7 +54,7 @@ const getAuthorByID = async (req, res) => {
 
     try{
         let id = parseInt(req.params.id);
-        const foundAuthor = await prisma.tag.findFirst({
+        const foundAuthor = await prisma.authors.findFirst({
             where:{
                 ID:id, 
                 status : 1
@@ -67,7 +67,8 @@ const getAuthorByID = async (req, res) => {
         const updatedAtFormat = dayjs(foundAuthor.updated_at);
         foundAuthor.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
         foundAuthor.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-        return new Response(res).setResponse(foundAuthor).setID(1).send();
+
+        return new Response(res).setResponse(foundAuthor).send();
 
      }catch(err){
         console.log("Error getAuthorByID:" + err.message);
@@ -81,16 +82,22 @@ const getAuthorByFilter = async (req, res) =>{
         const result = [];
         const username  = req.query.username;
         const created_by = req.query.created_by;
-        //const {name} = filters;
+        let whereConditions = {};
+
+        if (username) {
+            whereConditions.username = { contains: username };
+        }
+
+        if (created_by) {
+            whereConditions.created_by = created_by;
+        }
+        whereConditions.status = 1;
+
         const authorList = await prisma.authors.findMany({
-            where:{
-                username:{contains : username}, 
-                created_by: created_by,
-                status : 1
-            }
-        })
-        
-        if(authorList.length == 0){
+            where: whereConditions
+        });
+
+        if (authorList.length === 0) {
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         }
 
@@ -101,7 +108,7 @@ const getAuthorByFilter = async (req, res) =>{
             t.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
             result.push(t);
         });
-        return new Response(res).setResponse(authorList).setID(1).send();
+        return new Response(res).setResponse(authorList).send();
 
     }catch(err){
         console.log("Error getAuthorByFilter:" + err.message);
@@ -121,14 +128,16 @@ const addAuthor = async (req, res) => {
         const foundAuthor = await prisma.authors.findFirst(
             {where:{username:username}
         });
+
         if(!foundAuthor){
-            await prisma.authors.create({ 
-                data: {
-                    username:username, 
-                    biography:biography, 
-                    created_by:created_by
-                }, 
-            });
+            const data = {
+                username: username,
+                created_by: created_by
+            }
+            if (biography) {
+                data.biography = biography;
+            }
+            await prisma.authors.create({ data });
             return new Response(res).setID(1).setStatusCode(201).setMessage("Author created successfully.").send();
         }
         return new Response(res).setID(0).setStatusCode(400).setMessage("Author already exist.").send();
@@ -158,12 +167,12 @@ const updateAuthor = async (req,res) =>{
         const checkRecordExist = await prisma.authors.findFirst({where:{username:username}});
 
         if(checkRecordExist && checkRecordExist?.ID != id){
-            return new Response(res).setID(0).setStatusCode(400).setMessage("Username already exist.").send();
+            return new Response(res).setID(0).setStatusCode(400).setMessage("author already exist.").send();
         }else{
             await prisma.authors.update({
                 where:{ID:id},
                 data:{
-                    usernamename : username,
+                    username : username,
                     biography : biography,
                     updated_by : updated_by
                 }
@@ -182,7 +191,9 @@ const deleteAuthor = async (req,res) =>{
         if (isNaN(id)) {
             return new Response(res).setID(0).setStatusCode(400).setMessage("ID must be a number.").send;
         }
-        const foundAuthor = await prisma.tag.findFirst({where:{ID:id, status:1}});
+        const foundAuthor = await prisma.authors.findFirst({
+            where:{ID:id, status:1}
+        });
 
         if(!foundAuthor){
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
@@ -193,10 +204,10 @@ const deleteAuthor = async (req,res) =>{
                status:0 
             }
         });
-        return new Response(res).setID(1).setMessage("Tag deleted successfully.").send();
+        return new Response(res).setID(1).setMessage("Author deleted successfully.").send();
 
     }catch(err){
-        console.log("Error deleteTag:" + err.message);
+        console.log("Error deleteAuthor:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
     } 
 }
