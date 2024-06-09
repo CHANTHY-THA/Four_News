@@ -267,7 +267,7 @@ const updateNews = async (req, res) => {
           image,
           short_description,
           content,
-          updated_by,
+          updated_by: req.user.username
         },
       });
       return new Response(res)
