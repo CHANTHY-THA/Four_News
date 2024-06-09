@@ -18,7 +18,7 @@ const authMiddleware = (req, res, next) => {
     try {
       const payload = jwtLib.verifyToken(token);
       console.log({ payload });
-      req.userId = payload.userId;
+      req.user = payload.user;
       next();
     } catch (error) {
       console.log({ error });

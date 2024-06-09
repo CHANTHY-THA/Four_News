@@ -1,19 +1,19 @@
 const express = require("express");
 const userRoutes = express.Router();
 const UserController = require("../controllers/userController");
+const authMiddleware = require("../middlewares/authMiddleware");
+userRoutes.get("/users", authMiddleware, UserController.getUsers);
 
-userRoutes.get("/users", UserController.getUsers);
+userRoutes.get("/user/:id", authMiddleware, UserController.getUserByID);
 
-userRoutes.get("/user/:id", UserController.getUserByID);
+userRoutes.get("/users/filter", authMiddleware, UserController.getUserByFilter);
 
-userRoutes.get("/users/filter", UserController.getUserByFilter);
+userRoutes.post("/user", authMiddleware, UserController.addUser);
 
-userRoutes.post("/user", UserController.addUser);
+userRoutes.patch("/username/:id", authMiddleware, UserController.updateUsername);
 
-userRoutes.patch("/username/:id", UserController.updateUsername);
+userRoutes.patch("/password/:id", authMiddleware, UserController.updatePassword);
 
-userRoutes.patch("/password/:id", UserController.updatePassword);
-
-userRoutes.delete("/user/:id", UserController.deleteUser);
+userRoutes.delete("/user/:id", authMiddleware, UserController.deleteUser);
 
 module.exports = userRoutes;
