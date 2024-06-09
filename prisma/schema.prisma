@@ -22,6 +22,8 @@ model categories {
   updated_by String?
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
+
+  news News[]
 }
 model tags {
   ID  Int  @id  @default(autoincrement())
@@ -41,6 +43,22 @@ model authors{
   updated_by String?
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
+}
+model News {
+  ID  Int  @id  @default(autoincrement())
+  title  String
+  image  String
+  short_description  String? @db.Text
+  content String? @db.Text
+  status Int @default(1)
+  created_by String
+  updated_by String?
+  publish_date DateTime @default(now())
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  category  categories   @relation(fields: [categoryID], references: [id])
+  categoryID Int
 }
 
 
