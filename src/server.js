@@ -6,6 +6,7 @@ const authorRoute = require("./routes/authorRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const userRoute = require("./routes/userRoutes");
 const authRoute = require("./routes/authRoutes");
+const newsTagRoutes = require("./routes/newstagRoutes");
 
 
 const router = express();
@@ -18,6 +19,7 @@ router.use("/api",categoryRoute);
 router.use("/api",tagRoute);
 router.use("/api",authorRoute);
 router.use("/api",newsRoutes);
+router.use("/api",newsTagRoutes);
 router.use("/api", userRoute);
 router.use("/api", authRoute);
 
