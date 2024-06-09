@@ -4,6 +4,7 @@ const dayjs = require('dayjs');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const jwtLib = require("../libs/jwt");
+const salt = 10;
 
 
 const login = async (req, res) => {
@@ -45,7 +46,7 @@ const login = async (req, res) => {
 const getUser = async (req, res) => {
 
     console.log(res.user);
-    
+
     try {
         const loginId = req.user.ID;
         const foundUser = await prisma.users.findUnique({
@@ -76,8 +77,42 @@ function getProfile(profile) {
 }
 
 
+const addDummySuperAdmin = async (req, res) => {
+    try {
+        const password = "123"
+        const adminPayload = {
+            username: "admin",
+            password: bcrypt.hashSync(password, salt),
+            role: "superAdmin",
+        }
+
+        await prisma.users.create({
+            data: adminPayload
+        });
+        adminPayload.password = password;
+        return new Response(res)
+            .setResponse(adminPayload)
+            .setID(1)
+            .setStatusCode(201)
+            .setMessage("Super admin user create successfully.")
+            .send();
+
+    } catch (err) {
+        console.log("Error addUser:" + err.message);
+        return new Response(res)
+            .setID(0)
+            .setStatusCode(500)
+            .setMessage("Something went wrong.")
+            .send();
+    }
+};
+
+
+
+
 
 module.exports = {
     login,
-    getUser
+    getUser,
+    addDummySuperAdmin
 };

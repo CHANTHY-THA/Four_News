@@ -8,5 +8,7 @@ authRoutes.post("/auth/login", authController.login);
 
 authRoutes.get("/auth/user", authMiddleware, authController.getUser);
 
+authRoutes.post("/auth/createDummySuperAdmin", authController.addDummySuperAdmin);
+
 
 module.exports = authRoutes;
