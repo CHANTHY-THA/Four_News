@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/adapter-pg": "^5.15.0",
     "@prisma/client": "^5.15.0",
     "bcrypt": "^5.1.1",
     "dayjs": "^1.11.11",
@@ -16,7 +17,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "nodemodule": "^0.3.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "pg": "^8.12.0"
   },
   "devDependencies": {
     "prisma": "^5.15.0"

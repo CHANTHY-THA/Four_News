@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model categories {
+model Categories {
   ID  Int  @id  @default(autoincrement())
   name  String
   description  String? @db.Text
@@ -22,8 +22,9 @@ model categories {
   updated_by String?
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
+  news News[]
 }
-model tags {
+model Tags {
   ID  Int  @id  @default(autoincrement())
   name  String
   status Int @default(1)
@@ -32,7 +33,7 @@ model tags {
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
 }
-model authors{
+model Authors{
   ID  Int  @id  @default(autoincrement())
   username  String
   biography String?
@@ -41,9 +42,31 @@ model authors{
   updated_by String?
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
+
+  news News[]
+}
+model News {
+  ID  Int  @id  @default(autoincrement())
+  categoryId Int
+  authorId Int
+  userId Int
+  title  String
+  image  String
+  short_description  String? @db.Text
+  content String? @db.Text
+  status Int @default(1)
+  created_by String
+  updated_by String?
+  publish_date DateTime @default(now())
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  category Categories @relation(fields: [categoryId], references: [ID])
+  author Authors @relation(fields: [authorId], references: [ID])
+  user Users @relation(fields: [userId], references: [ID])
 }
 
-model users {
+model Users {
   ID  Int  @id  @default(autoincrement())
   username  String
   password String
@@ -52,4 +75,6 @@ model users {
   status Int @default(1)
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
+
+  news News[]
 }

@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const categoryRoute = require("./routes/categoryRoutes");
 const tagRoute = require("./routes/tagRoutes");
 const authorRoute = require("./routes/authorRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 const userRoute = require("./routes/userRoutes");
 const authRoute = require("./routes/authRoutes");
 
@@ -13,9 +14,10 @@ router.use(express.json());
 dotenv.config({ path: __dirname + "/../.env" });
 
 
-router.use("/api", categoryRoute);
-router.use("/api", tagRoute);
-router.use("/api", authorRoute);
+router.use("/api",categoryRoute);
+router.use("/api",tagRoute);
+router.use("/api",authorRoute);
+router.use("/api",newsRoutes);
 router.use("/api", userRoute);
 router.use("/api", authRoute);
 
