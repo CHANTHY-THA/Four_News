@@ -5,7 +5,7 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 newsRoutes.get("/news", newController.getNews);
 
-newsRoutes.get("/news/:id", newController.getNewsByID);
+newsRoutes.get("/singlenews/:id", newController.getNewsByID);
 
 newsRoutes.get("/news/filter", newController.getNewsByFilter);
 

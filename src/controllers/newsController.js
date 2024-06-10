@@ -16,14 +16,19 @@ const getNews = async (req, res) => {
       },
     });
 
-    const totalRecordPerPage = await prisma.News.findMany({
+    const newsList = await prisma.News.findMany({
       where: { status: 1 },
+      include: {
+        category: true,
+        author: true,
+        user: true,
+      },
       skip: recordSkip,
       take: limit,
       orderBy: { ID: "desc" },
     });
 
-    totalRecordPerPage.forEach((cat) => {
+    newsList.forEach((cat) => {
       const createdAtFormat = dayjs(cat.created_at);
       const updatedAtFormat = dayjs(cat.updated_at);
       cat.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
@@ -54,9 +59,17 @@ const getNews = async (req, res) => {
 };
 
 const getNewsByID = async (req, res) => {
+
+  console.log("Get News By ID");
   try {
     let id = parseInt(req.params.id);
     const foundNews = await prisma.News.findFirst({
+      include: {
+        category: true,
+        author: true,
+        user: true,
+      },
+
       where: {
         ID: id,
         status: 1,
@@ -85,10 +98,11 @@ const getNewsByID = async (req, res) => {
 };
 
 const getNewsByFilter = async (req, res) => {
+
+  console.log("My Filter");
   try {
     const result = [];
     const title = req.query.title;
-    const content = req.query.content;
     const created_by = req.query.created_by;
 
     // pagination
@@ -98,9 +112,14 @@ const getNewsByFilter = async (req, res) => {
     const endIndex = page * limit;
 
     const newsList = await prisma.News.findMany({
+      include: {
+        category: true,
+        author: true,
+        user: true,
+      },
+      
       where: {
         title: { contains: title },
-        content: content,
         created_by: created_by,
         status: 1,
       },
@@ -123,16 +142,16 @@ const getNewsByFilter = async (req, res) => {
       result.push(cat);
     });
 
-    const total_page = Math.ceil(categoryList.length / limit);
+    const total_page = Math.ceil(newsList.length / limit);
     const pagination = {
-      total_record: categoryList.length,
+      total_record: newsList.length,
       limit: limit,
       current_page: page,
       total_page: total_page,
       has_next: page < total_page,
     };
     return new Response(res)
-      .setResponse({ categories: result, pagination: pagination })
+      .setResponse({ news: result, pagination: pagination })
       .setID(1)
       .send();
   } catch (err) {
@@ -327,9 +346,9 @@ const deleteNews = async (req, res) => {
 
 module.exports = {
   getNews,
+  getNewsByID,
+  getNewsByFilter,
   addNews,
   updateNews,
-  getNewsByID,
   deleteNews,
-  getNewsByFilter,
 };
