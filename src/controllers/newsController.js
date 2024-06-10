@@ -60,7 +60,6 @@ const getNews = async (req, res) => {
 
 const getNewsByID = async (req, res) => {
 
-  console.log("Get News By ID");
   try {
     let id = parseInt(req.params.id);
     const foundNews = await prisma.News.findFirst({
@@ -99,10 +98,10 @@ const getNewsByID = async (req, res) => {
 
 const getNewsByFilter = async (req, res) => {
 
-  console.log("My Filter");
   try {
     const result = [];
     const title = req.query.title;
+    const categoryname = req.query.categoryname;
     const created_by = req.query.created_by;
 
     // pagination
@@ -110,6 +109,15 @@ const getNewsByFilter = async (req, res) => {
     let limit = 2;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
+
+    const category = await prisma.categories.findFirst({
+      where: {
+        name: { contains: categoryname },
+        status: 1
+      }
+    })
+
+    console.log("category ", category);
 
     const newsList = await prisma.News.findMany({
       include: {
@@ -120,6 +128,7 @@ const getNewsByFilter = async (req, res) => {
       
       where: {
         title: { contains: title },
+        categoryId: category.ID,
         created_by: created_by,
         status: 1,
       },
