@@ -81,7 +81,13 @@ const getTagByFilter = async (req, res) => {
         const result = [];
         const name = req.query.name;
         const created_by = req.query.created_by;
-        //const {name} = filters;
+
+        // pagination       
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(process.env.PAGESIZE);
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
         const tagList = await prisma.tags.findMany({
             where: {
                 name: { contains: name },
@@ -93,15 +99,24 @@ const getTagByFilter = async (req, res) => {
         if (tagList.length == 0) {
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         }
+        const tags = tagList.slice(startIndex, endIndex);
 
-        tagList.forEach(t => {
+        tags.forEach(t => {
             const createdAtFormat = dayjs(t.created_at);
             const updatedAtFormat = dayjs(t.updated_at);
             t.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
             t.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
             result.push(t);
         });
-        return new Response(res).setResponse(tagList).setID(1).send();
+        const total_page = Math.ceil(tagList.length / limit);
+        const pagination = {
+            total_record: tagList.length,
+            limit: limit,
+            current_page: page,
+            total_page: total_page,
+            has_next: page < total_page
+        }
+        return new Response(res).setResponse({ tags: result, pagination: pagination }).setID(1).send();
 
     } catch (err) {
         console.log("Error getTagByFilter:" + err.message);
