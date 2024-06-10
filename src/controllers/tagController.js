@@ -54,6 +54,7 @@ const getTagByID = async (req, res) => {
 
     try {
         let id = parseInt(req.params.id);
+        console.log("ID :  "+ id);
         const foundTag = await prisma.tags.findFirst({
             where: {
                 ID: id,
