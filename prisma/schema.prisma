@@ -79,7 +79,7 @@ model News {
   category Categories @relation(fields: [categoryId], references: [ID])
   author Authors @relation(fields: [authorId], references: [ID])
   user Users @relation(fields: [userId], references: [ID])
-  articleTag NewsTags[]
+  newsTag NewsTags[]
 }
 
 model Users {
