@@ -8,7 +8,7 @@ const salt = 10;
 const getUsers = async (req, res) => {
     try {
         let page = parseInt(req.query.page) || 1;
-        let limit = 10;
+        let limit = parseInt(process.env.PAGESIZE);
         let result = [];
         let recordSkip = (page - 1) * limit;
 
@@ -106,7 +106,7 @@ const getUserByFilter = async (req, res) => {
 
         // pagination
         let page = parseInt(req.query.page) || 1;
-        let limit = 2;
+        let limit = parseInt(process.env.PAGESIZE);
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
 

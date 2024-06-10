@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const getNewsTag = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
-    let limit = 10;
+    let limit = parseInt(process.env.PAGESIZE);
     let result = [];
     let recordSkip = (page - 1) * limit;
 

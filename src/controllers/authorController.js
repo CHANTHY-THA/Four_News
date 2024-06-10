@@ -5,23 +5,23 @@ const prisma = new PrismaClient();
 
 const getAuthors = async (req, res) => {
 
-   try{
+    try {
         let page = parseInt(req.query.page) || 1;
-        let limit = 10;
+        let limit = parseInt(process.env.PAGESIZE);
         let result = [];
         let recordSkip = (page - 1) * limit;
-       
+
         const totalRecord = await prisma.authors.findMany({
-           where:{
-            status:1
-           }
+            where: {
+                status: 1
+            }
         });
 
         const totalRecordPerPage = await prisma.authors.findMany({
-            where:{status:1},
-            skip:recordSkip,
-            take:limit,
-            orderBy:{ID:'desc'}
+            where: { status: 1 },
+            skip: recordSkip,
+            take: limit,
+            orderBy: { ID: 'desc' }
         })
 
         totalRecordPerPage.forEach(t => {
@@ -32,37 +32,37 @@ const getAuthors = async (req, res) => {
             result.push(t);
         });
 
-        const total_page = Math.ceil(totalRecord.length/limit);
-        const pagination ={
-            total_record : totalRecord.length,
-            limit : limit,
-            current_page : page,
-            total_page : total_page,
-            has_next : page < total_page
+        const total_page = Math.ceil(totalRecord.length / limit);
+        const pagination = {
+            total_record: totalRecord.length,
+            limit: limit,
+            current_page: page,
+            total_page: total_page,
+            has_next: page < total_page
         }
-        return new Response(res).setResponse({tags:result, pagination:pagination}).setID(1).send();
+        return new Response(res).setResponse({ tags: result, pagination: pagination }).setID(1).send();
 
-    }catch(err){
+    } catch (err) {
         console.log("Error getAuthors:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
-        
+
     }
 };
 
 
 const getAuthorByID = async (req, res) => {
 
-    try{
+    try {
         let id = parseInt(req.params.id);
         const foundAuthor = await prisma.authors.findFirst({
-            where:{
-                ID:id, 
-                status : 1
+            where: {
+                ID: id,
+                status: 1
             }
         });
-        if(!foundAuthor){
+        if (!foundAuthor) {
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
-        } 
+        }
         const createdAtFormat = dayjs(foundAuthor.created_at);
         const updatedAtFormat = dayjs(foundAuthor.updated_at);
         foundAuthor.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
@@ -70,17 +70,17 @@ const getAuthorByID = async (req, res) => {
 
         return new Response(res).setResponse(foundAuthor).send();
 
-     }catch(err){
+    } catch (err) {
         console.log("Error getAuthorByID:" + err.message);
-        return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();   
+        return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
     }
 };
 
-const getAuthorByFilter = async (req, res) =>{
+const getAuthorByFilter = async (req, res) => {
 
-    try{
+    try {
         const result = [];
-        const username  = req.query.username;
+        const username = req.query.username;
         const created_by = req.query.created_by;
         let whereConditions = {};
 
@@ -110,27 +110,28 @@ const getAuthorByFilter = async (req, res) =>{
         });
         return new Response(res).setResponse(authorList).send();
 
-    }catch(err){
+    } catch (err) {
         console.log("Error getAuthorByFilter:" + err.message);
-        return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();   
+        return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
     }
 }
 
 const addAuthor = async (req, res) => {
-    try{ 
+    try {
         const body = req.body;
-        console.log("login user",req.user);
-        const { username,biography } = body;
-       
-        if(!username){
+        console.log("login user", req.user);
+        const { username, biography } = body;
+
+        if (!username) {
             return new Response(res).setID(0).setStatusCode(400).setMessage(" username is required.").send();
         }
 
         const foundAuthor = await prisma.authors.findFirst(
-            {where:{username:username}
-        });
+            {
+                where: { username: username }
+            });
 
-        if(!foundAuthor){
+        if (!foundAuthor) {
             const data = {
                 username: username,
                 created_by: req.user.username
@@ -143,74 +144,74 @@ const addAuthor = async (req, res) => {
         }
         return new Response(res).setID(0).setStatusCode(400).setMessage("Author already exist.").send();
 
-    }catch(err){
+    } catch (err) {
         console.log("Error addAuthor:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
-    }  
+    }
 };
 
-const updateAuthor = async (req,res) =>{
-    try{
+const updateAuthor = async (req, res) => {
+    try {
         const body = req.body;
-        const { username,biography,id } = body;
-        if(!username){
+        const { username, biography, id } = body;
+        if (!username) {
             return new Response(res).setID(0).setStatusCode(400).setMessage("username is required.").send();
         }
 
         const foundAuthor = await prisma.authors.findFirst({
-            where:{ID:id, status:1}
+            where: { ID: id, status: 1 }
         });
         console.log("data: " + foundAuthor);
-        if(!foundAuthor){
+        if (!foundAuthor) {
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         }
 
-        const checkRecordExist = await prisma.authors.findFirst({where:{username:username}});
+        const checkRecordExist = await prisma.authors.findFirst({ where: { username: username } });
 
-        if(checkRecordExist && checkRecordExist?.ID != id){
+        if (checkRecordExist && checkRecordExist?.ID != id) {
             return new Response(res).setID(0).setStatusCode(400).setMessage("author already exist.").send();
-        }else{
+        } else {
             await prisma.authors.update({
-                where:{ID:id},
-                data:{
-                    username : username,
-                    biography : biography,
-                    updated_by : req.user.username
+                where: { ID: id },
+                data: {
+                    username: username,
+                    biography: biography,
+                    updated_by: req.user.username
                 }
             });
             return new Response(res).setID(1).setMessage("Author updated successfully.").send();
         }
-    }catch(err){
+    } catch (err) {
         console.log("Error updateAuthor:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
-    } 
+    }
 }
 
-const deleteAuthor = async (req,res) =>{
-    try{
+const deleteAuthor = async (req, res) => {
+    try {
         const id = parseInt(req.params.id);
         if (isNaN(id)) {
             return new Response(res).setID(0).setStatusCode(400).setMessage("ID must be a number.").send;
         }
         const foundAuthor = await prisma.authors.findFirst({
-            where:{ID:id, status:1}
+            where: { ID: id, status: 1 }
         });
 
-        if(!foundAuthor){
+        if (!foundAuthor) {
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();
         }
         await prisma.authors.update({
-            where: {ID:id},
-            data:{
-               status:0 
+            where: { ID: id },
+            data: {
+                status: 0
             }
         });
         return new Response(res).setID(1).setMessage("Author deleted successfully.").send();
 
-    }catch(err){
+    } catch (err) {
         console.log("Error deleteAuthor:" + err.message);
         return new Response(res).setID(0).setStatusCode(500).setMessage("Something went wrong.").send();
-    } 
+    }
 }
 
 
