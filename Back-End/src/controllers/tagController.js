@@ -7,7 +7,7 @@ const getTags = async (req, res) => {
 
     try {
         let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(process.env.PAGESIZE);
+        let limit = parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
         let result = [];
         let recordSkip = (page - 1) * limit;
 
@@ -16,6 +16,11 @@ const getTags = async (req, res) => {
                 status: 1
             }
         });
+
+        if(limit == -1){
+            recordSkip = 0;
+            limit=totalRecord.length;
+        }
 
         const totalRecordPerPage = await prisma.tags.findMany({
             where: { status: 1 },
@@ -54,7 +59,6 @@ const getTagByID = async (req, res) => {
 
     try {
         let id = parseInt(req.params.id);
-        console.log("ID :  "+ id);
         const foundTag = await prisma.tags.findFirst({
             where: {
                 ID: id,
@@ -85,17 +89,27 @@ const getTagByFilter = async (req, res) => {
 
         // pagination       
         let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(process.env.PAGESIZE);
-        const startIndex = (page - 1) * limit;
-        const endIndex = page * limit;
+        let limit = parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
+        let startIndex = (page - 1) * limit;
+        let endIndex = page * limit;
 
-        const tagList = await prisma.tags.findMany({
+        let tagList = await prisma.tags.findMany({
             where: {
-                name: { contains: name },
-                created_by: created_by,
                 status: 1
             }
         })
+        if(created_by != "All" && created_by != null){
+            tagList = tagList.filter(tag=>tag.created_by==created_by);
+        }
+        if(name != ""){
+            tagList = tagList.filter(tag=>tag.name.toLowerCase().includes(name.toLowerCase()));
+        }
+
+        if(limit == -1){
+            startIndex = 0;
+            limit=tagList.length;
+            endIndex = limit;
+          }
 
         if (tagList.length == 0) {
             return new Response(res).setID(0).setStatusCode(404).setMessage("No data found.").send();

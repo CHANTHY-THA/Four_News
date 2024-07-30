@@ -1,10 +1,9 @@
 <template>
   <v-app>
     <v-main>
-      <router-view :key="$route.fullPath"/>
+      <router-view :key="$route.fullPath" />
     </v-main>
   </v-app>
-
 </template>
 
 <!-- <template>

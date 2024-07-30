@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const getCategories = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(process.env.PAGESIZE);
+    let limit = parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
     let result = [];
     let recordSkip = (page - 1) * limit;
 
@@ -15,6 +15,10 @@ const getCategories = async (req, res) => {
         status: 1,
       },
     });
+    if(limit == -1){
+      recordSkip = 0;
+      limit=totalRecord.length;
+    }
 
     const totalRecordPerPage = await prisma.categories.findMany({
       where: { status: 1 },
@@ -88,23 +92,34 @@ const getCategoryByFilter = async (req, res) => {
   try {
     const result = [];
     const name = req.query.name;
-    const created_by = req.query.created_by;
+    const created = req.query.created_by;
     const description = req.query.description;
-
     // pagination
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(process.env.PAGESIZE);
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+    let limit = parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
+    let startIndex = (page - 1) * limit;
+    let endIndex = page * limit;
 
-    const categoryList = await prisma.categories.findMany({
+    let categoryList = await prisma.categories.findMany({
       where: {
-        name: { contains: name },
-        created_by: created_by,
-        description: { contains: description },
         status: 1,
       },
     });
+    if(created != "All" && created != ""){
+      categoryList = categoryList.filter(cat=>cat.created_by==created);
+    }
+    if(name != ""){
+      categoryList = categoryList.filter(cat=>cat.name.toLowerCase().includes(name.toLowerCase()));
+    }
+    if(description != ""){
+      categoryList = categoryList.filter(cat=>cat.description.toLowerCase().includes(description.toLowerCase()));
+    }
+
+    if(limit == -1){
+      startIndex = 0;
+      limit=categoryList.length;
+      endIndex = limit;
+    }
 
     if (categoryList.length == 0) {
       return new Response(res)
@@ -204,7 +219,7 @@ const updateCategory = async (req, res) => {
     const foundCategory = await prisma.categories.findFirst({
       where: { ID: id, status: 1 },
     });
-    console.log("data: " + foundCategory);
+
     if (!foundCategory) {
       return new Response(res)
         .setID(0)

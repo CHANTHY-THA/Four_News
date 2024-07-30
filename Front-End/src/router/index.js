@@ -1,12 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import CategoryView from '../views/CategoryView.vue'
+import User from '../views/User.vue'
+import Login from '../views/Login.vue'
+import MenuBar from '../views/MenuBar.vue'
+// import { loadLayoutMiddleware } from '@/router/middleware/loadLayoutMiddleware';
 
 const routes = [
   {
-    path: '/',
+    path: '/category',
     name: 'category',
-    component: CategoryView
+    component: CategoryView,
+    meta: {
+      layout: 'AppLayout'
+    }
   },
   {
     path: '/home',
@@ -20,6 +27,34 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+  },
+  {
+    path: '/user',
+    name: 'user',
+
+    component: User,
+    meta: {
+      layout: 'AppLayout'
+    }
+
+  },
+  {
+    path: '/',
+    name: 'menu',
+    component: MenuBar,
+    meta: {
+      layout: 'AppLayout'
+    }
+
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: Login,
+    meta: {
+      layout: 'AppLayout'
+    }
+
   }
 ]
 
@@ -27,5 +62,7 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+// router.beforeEach(loadLayoutMiddleware)
 
 export default router

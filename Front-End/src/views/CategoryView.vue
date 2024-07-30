@@ -1,158 +1,218 @@
 <template>
-  
   <div>
-<!-- import menu component -->
-  </div>
-  <div style="padding:20px; background:#E0E0E0; height: 100%;">
-    <div style="margin-bottom: 30px;">
-      <!-- add and edit form -->
-      <v-dialog
-        v-model="dialog"
-        persistent
-        transition="dialog-center-transition"
-        max-width="500px"
-      >
-        <template v-slot:activator="{ props }">
-          <v-btn
-            color="info"
-            dark
-            class="mb-2 float-right"
-            v-bind="props"
-          >
-          Add Category
-          <!-- <ToolTipMessage message="Add New Category"></ToolTipMessage> -->
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title
-            style="padding:15px"
-            primary-title
-          >
-          {{ formTitle }}
-          </v-card-title>
-          <hr/>
-          <!-- <v-card-title>
-            <span class="text-h5">{{ formTitle }}</span>
-          </v-card-title> -->
-          <v-card-text>
-            <v-container>
-              <v-form
-                v-model="form"
-              >
-              <v-row>
-                <v-col cols="12" >
-                    <v-text-field
-                      v-model = "name"
-                      :rules="[required]"
-                      density="compact"
-                      label="Category Name"
-                      color="primary"
-                      variant="outlined"
-                    ></v-text-field>
-               
-                  <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
-                </v-col>
-              </v-row>
-              <v-row style="margin-top: -15px;" >
-                <v-col cols="12" >
-                    <v-text-field
-                      v-model = "description"
-                      :rules="[required]"
-                      density="compact"
-                      label="Description"
-                      color="primary"
-                      variant="outlined"
-                    ></v-text-field>
-               
-                  <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
-                </v-col>
-              </v-row>
-              </v-form>
-            </v-container>
-          </v-card-text>
-          <v-card-actions style="justify-content: center !important; margin-bottom: 20px; margin-top: -25px;">
-            <v-btn
-              style="background-color: red; color: white;"
-              variant="text"
-              @click="CloseFormAddEdit"
-            >
-              Cancel
-            </v-btn>
-            <v-btn
-              :disabled="!form"
-              class="bg-info"
-              style="background-color: rgb(8, 88, 145); color: white;"
-              @click="SaveCategory"
-            >
-              Submit
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </div>
-    <v-data-table-server
-      v-model:items-per-page="itemsPerPage"
-      :headers="headers"
-      :items="categoryList"
-      :items-length="totalItems"
-      :loading="loading"
-      item-value="name"   
-      @update:options="loadItems"
-    >
-      <template v-slot:top>
-        <v-toolbar
-          flat
-          color="white"
-          style="border-bottom:1px solid rgba(128, 128, 128, 0.577); display: flex; justify-content: space-between;"
+    <MenuComponent />
+    <div style="padding: 20px; background: #e0e0e0; height: 100%">
+      <!-- block rearch -->
+      <div>
+        <v-row style="margin-top: 10px; margin-left: 10px; margin-right: 10px">
+          <v-col cols="4">
+            <v-text-field
+              v-model="s_name"
+              label="Name"
+              color="primary"
+              variant="underlined"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="4">
+            <v-text-field
+              v-model="s_descrition"
+              label="Description"
+              color="primary"
+              variant="underlined"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="4">
+            <v-select
+              :items="userList"
+              item-title="username"
+              v-model="userSelected"
+              label="--Select user--"
+              color="primary"
+              variant="underlined"
+              return-object
+            ></v-select>
+          </v-col>
+        </v-row>
+        <v-row
+          style="
+            margin-top: -10px;
+            margin-bottom: 30px;
+            margin-right: 15px;
+            float: right;
+            margin-left: 20px;
+          "
         >
-          <v-toolbar-title>Category List</v-toolbar-title>
-        </v-toolbar>
-      </template>
-      <template v-slot:item="{item}">
-        <tr >
-          <td >{{item.ID}}</td>
-          <td>{{item.name}}</td>
-          <td>{{item.description}}</td>
-          <td>{{item.created_by}}</td>
-          <td>{{item.created_at}}</td>
-          <td >
-            <div class="d-flex">
-              <div @click="EditCategory(item)" style="margin-right: 5px; background: green;border-radius: 50%; width: 30px; height: 30px; align-items: center !important; display: flex; justify-content: center !important;">
-                <v-icon size="17" color="white" > mdi-pencil</v-icon>
-                <ToolTipMessage message="Edit Category"></ToolTipMessage>
-              </div>
-              <div @click="DeleteCategory(item.ID,item.name)"  style="background: red; border-radius: 50%; width: 30px; height: 30px; align-items: center !important; display: flex; justify-content: center !important;">
-                <v-icon size="17" color="white"> mdi-delete</v-icon>
-              </div>
-            </div>
-          </td>
-        </tr>
-    </template>   
-    </v-data-table-server>
-    <v-dialog v-model="dialogDelete" persistent max-width="500px">
-      <v-card>
-         
-          <v-card-title
-            class=" "
-            primary-title
+          <!-- <v-icon @click="searchCategory" size="50" color="blue" style="cursor: pointer;"> mdi-card-search</v-icon> -->
+          <v-btn @click="searchCategory" style="cursor: pointer" color="blue"
+            >Search</v-btn
           >
-          Delete Category
-          </v-card-title>
-          <hr/>
+        </v-row>
+      </div>
+
+      <!-- datatable -->
+      <v-card flat class="mt-2" style="width: 100%">
+        <v-card-title class="d-flex align-center pe-2" style="padding: 15px">
+          Category List
+          <!-- <v-spacer></v-spacer> -->
+          <!-- add and edit  form -->
+          <div>
+            <v-dialog
+              v-model="dialog"
+              persistent
+              transition="dialog-center-transition"
+              max-width="500px"
+            >
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  color="info"
+                  dark
+                  v-bind="props"
+                  style="margin-left: 20px"
+                >
+                  Create
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title style="padding: 15px" primary-title>
+                  {{ formTitle }}
+                </v-card-title>
+                <hr />
+                <v-card-text>
+                  <v-container>
+                    <v-form v-model="form">
+                      <v-row>
+                        <v-col cols="12">
+                          <v-text-field
+                            v-model="name"
+                            :rules="[required]"
+                            density="compact"
+                            label="Category Name"
+                            color="primary"
+                            variant="outlined"
+                          ></v-text-field>
+                        </v-col>
+                      </v-row>
+                      <v-row style="margin-top: -15px">
+                        <v-col cols="12">
+                          <v-text-field
+                            v-model="description"
+                            :rules="[required]"
+                            density="compact"
+                            label="Description"
+                            color="primary"
+                            variant="outlined"
+                          ></v-text-field>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-container>
+                </v-card-text>
+                <v-card-actions
+                  style="
+                    justify-content: center !important;
+                    margin-bottom: 20px;
+                    margin-top: -25px;
+                  "
+                >
+                  <v-btn
+                    style="background-color: red; color: white"
+                    variant="text"
+                    @click="CloseFormAddEdit"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    :disabled="!form"
+                    class="bg-info"
+                    style="background-color: rgb(8, 88, 145); color: white"
+                    @click="SaveCategory"
+                  >
+                    Submit
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-data-table-server
+          v-model:items-per-page="itemsPerPage"
+          :headers="headers"
+          :items="categoryList"
+          :items-length="totalItems"
+          :loading="loading"
+          item-value="name"
+          @update:options="loadItems"
+        >
+          <template v-slot:item="{ item }">
+            <tr>
+              <td>{{ item.ID }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.description }}</td>
+              <td>{{ item.created_by }}</td>
+              <td>{{ item.created_at }}</td>
+              <td>
+                <div class="d-flex">
+                  <div
+                    @click="EditCategory(item)"
+                    style="
+                      margin-right: 5px;
+                      background: green;
+                      border-radius: 50%;
+                      width: 30px;
+                      height: 30px;
+                      align-items: center !important;
+                      display: flex;
+                      justify-content: center !important;
+                    "
+                  >
+                    <v-icon size="17" color="white"> mdi-pencil</v-icon>
+                    <ToolTipMessage message="Edit Category"></ToolTipMessage>
+                  </div>
+                  <div
+                    @click="DeleteCategory(item.ID, item.name)"
+                    style="
+                      background: red;
+                      border-radius: 50%;
+                      width: 30px;
+                      height: 30px;
+                      align-items: center !important;
+                      display: flex;
+                      justify-content: center !important;
+                    "
+                  >
+                    <v-icon size="17" color="white"> mdi-delete</v-icon>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </template>
+        </v-data-table-server>
+      </v-card>
+
+      <!-- dialog delete -->
+      <v-dialog v-model="dialogDelete" persistent max-width="500px">
+        <v-card>
+          <v-card-title class=" " primary-title> Delete Category </v-card-title>
+          <hr />
           <v-card-text>
             <v-container>
-              <v-row >
-                <p>Are you sure, you want to delete category <q>{{ name  }}</q> ?</p>
+              <v-row>
+                <p>
+                  Are you sure, you want to delete category <q>{{ name }}</q> ?
+                </p>
               </v-row>
             </v-container>
           </v-card-text>
-          <v-card-actions style="justify-content: center !important; margin-bottom: 20px; margin-top: 0px;">
+          <v-card-actions
+            style="
+              justify-content: center !important;
+              margin-bottom: 20px;
+              margin-top: 0px;
+            "
+          >
             <v-btn
-              style="background-color: red; color: white;"
+              style="background-color: red; color: white"
               variant="text"
               @click="CloseDailogDelete"
             >
@@ -160,145 +220,218 @@
             </v-btn>
             <v-btn
               class="bg-info"
-              style="background-color: rgb(8, 88, 145); color: white;"
+              style="background-color: rgb(8, 88, 145); color: white"
               @click="ConfirmDeleteItem"
             >
               Yes
             </v-btn>
           </v-card-actions>
-        </v-card>    
-    </v-dialog>
+        </v-card>
+      </v-dialog>
 
-    <!-- Alert message -->
-    <AlertMessage  
-      v-model="snackbar"
-      :message="message"
-      :background="backgroundColor"
-    />
+      <!-- Alert message -->
+      <AlertMessage
+        v-model="snackbar"
+        :message="message"
+        :background="backgroundColor"
+      />
+    </div>
   </div>
-  </template>
+</template>
   <script>
-  import axios from 'axios';
-  import AlertMessage from '@/components/AlertMessage.vue';
+import axios from "axios";
+import AlertMessage from "@/components/AlertMessage.vue";
+import MenuComponent from "@/components/MenuComponent.vue";
 
-  export default {
-    components: {
-      AlertMessage,
+export default {
+  components: {
+    AlertMessage,
+    MenuComponent,
+  },
+  data: () => ({
+    headers: [
+      { title: "ID", align: "", sortable: false, key: "ID" },
+      { title: "Name", sortable: false, key: "name" },
+      { title: "Description", sortable: false, key: "description" },
+      { title: "CreatedBy", sortable: false, key: "created_by" },
+      { title: "CreatedAt", sortable: false, key: "created_at" },
+      { title: "Action", sortable: false },
+    ],
+    name: "",
+    description: "",
+    form: false,
+    dialog: false,
+    snackbar: false,
+    dialogDelete: false,
+    categoryList: [],
+    userList: [["All"]],
+    loading: true,
+    totalItems: 0,
+    cat_id: 0,
+    itemName: "",
+    message: "",
+    backgroundColor: "",
+    page: 1,
+    itemsPerPage: process.env.VUE_APP_ITEM_PER_PAGE,
+    userSelected: null,
+    s_name: "",
+    s_descrition: "",
+    username: "",
+  }),
+  computed: {
+    formTitle() {
+      return this.cat_id === 0 ? "Add New Category" : "Update Category";
     },
-    data: () => ({
-      
-      headers: [{title: 'ID',align: '',sortable: false,key: 'ID'},
-        { title: 'Name',sortable: false, key: 'name'},
-        { title: 'Description',sortable: false, key: 'description'},
-        { title: 'CreatedBy',sortable: false, key: 'created_by' },
-        { title: 'CreatedAt',sortable: false, key: 'created_at' },
-        { title: 'Action', sortable: false },
-      ],
-      name:"",
-      description:"",
-      form:false,
-      dialog: false,
-      snackbar: false,
-      dialogDelete:false,
-      categoryList: [],
-      loading: true,
-      totalItems: 0,
-      cat_id:0,
-      itemName:"",
-      message:"",
-      backgroundColor:"",
-      page:1,
-      itemsPerPage: process.env.VUE_APP_ITEM_PER_PAGE,
-    }),
-    computed: {
-      formTitle () {
-        return this.cat_id === 0 ? 'Add New Category' : 'Update Category'
-      },
+  },
+  methods: {
+    required(v) {
+      return !!v || "Field is required";
     },
-    methods: {
-      required (v) {
-        return !!v || 'Field is required'
-      },
-      loadItems ({ page, itemsPerPage }) {
-        this.page = page;
-        this.itemsPerPage = itemsPerPage;
+    loadItems({ page, itemsPerPage }) {
+      this.page = page;
+      this.itemsPerPage = itemsPerPage;
+      if (
+        this.s_name != "" ||
+        this.s_descrition != "" ||
+        this.userSelected != null
+      ) {
+        this.searchCategory();
+      } else {
         this.getCategory();
-      },
-      getCategory(){
-        const params = {page:this.page, itemPerPage:this.itemsPerPage};
-        axios.get(process.env.VUE_APP_API_URL+'/categories',{params}).then(res=>{
-            this.categoryList = res.data.data.categories;   
-            this.totalItems = res.data.data.pagination.total_record; 
-            this.loading = false;
+      }
+    },
+    getCategory() {
+      const params = { page: this.page, itemPerPage: this.itemsPerPage };
+      axios
+        .get(process.env.VUE_APP_API_URL + "/categories", { params })
+        .then((res) => {
+          this.categoryList = res.data.data.categories;
+          this.totalItems = res.data.data.pagination.total_record;
+          this.loading = false;
         });
-      },
-      EditCategory(cat){
-        this.dialog = true;
-        this.cat_id = cat.ID;
-        this.name = cat.name;
-        this.description = cat.description;
-      },
-      SaveCategory(){
-        let category = {
-          id: this.cat_id,
-          name:this.name,
-          description: this.description
+    },
+    searchCategory() {
+      if (
+        this.s_name != "" ||
+        this.s_descrition != "" ||
+        this.userSelected != null
+      ) {
+        if (this.userSelected != null) {
+          this.username =
+            this.userSelected == "All"
+              ? this.userSelected
+              : this.userSelected.username;
+        }
+        let params = {
+          page: this.page,
+          itemPerPage: this.itemsPerPage,
+          name: this.s_name,
+          description: this.s_descrition,
+          created_by: this.username,
         };
-        if(this.cat_id > 0){
-          axios.put(process.env.VUE_APP_API_URL+'/category',category,{ validateStatus: () => true }).then((res)=>{
+        axios
+          .get(
+            process.env.VUE_APP_API_URL + "/categories/filter",
+            { params },
+            { validateStatus: () => false }
+          )
+          .then((res) => {
+            this.categoryList = res.data.data.categories;
+            this.totalItems = res.data.data.pagination.total_record;
+            this.loading = false;
+          })
+          .catch((error) => {
+            this.categoryList = [];
+            console.log(error);
+          });
+      }
+    },
+    getUser() {
+      axios.get(process.env.VUE_APP_API_URL + "/users").then((res) => {
+        let users = res.data.data.users;
+        users.forEach((user) => {
+          this.userList.push(user);
+        });
+        // this.userSelected = this.userList[0];
+      });
+    },
+    EditCategory(cat) {
+      this.dialog = true;
+      this.cat_id = cat.ID;
+      this.name = cat.name;
+      this.description = cat.description;
+    },
+    SaveCategory() {
+      let category = {
+        id: this.cat_id,
+        name: this.name,
+        description: this.description,
+      };
+      if (this.cat_id > 0) {
+        axios
+          .put(process.env.VUE_APP_API_URL + "/category", category, {
+            validateStatus: () => true,
+          })
+          .then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
+          });
+      } else {
+        axios
+          .post(process.env.VUE_APP_API_URL + "/category", category, {
+            validateStatus: () => true,
           })
-        }else{
-          axios.post(process.env.VUE_APP_API_URL+'/category',category,{ validateStatus: () => true }).then((res)=>{
+          .then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
-          })
-        }
-      },
-      AddUpdateData(res_id){
-        if(res_id==1){
-          this.backgroundColor="green";
-        }else{
-          this.backgroundColor = "red";
-        }
-        this.snackbar = true;
-        this.getCategory();
-        this.CloseFormAddEdit();
-      },
-      DeleteCategory(id,name){
-        this.dialogDelete = true;
-        this.cat_id = id;
-        this.name = name;
-      },
-      ConfirmDeleteItem(){
-        console.log("id: " + this.cat_id);
-        console.log("name: " + this.name);
-        axios.delete(process.env.VUE_APP_API_URL+'/category/'+this.cat_id,{ validateStatus: () => true }).then((res)=>{
+          });
+      }
+    },
+    AddUpdateData(res_id) {
+      if (res_id == 1) {
+        this.backgroundColor = "green";
+      } else {
+        this.backgroundColor = "red";
+      }
+      this.snackbar = true;
+      this.getCategory();
+      this.CloseFormAddEdit();
+    },
+    DeleteCategory(id, name) {
+      this.dialogDelete = true;
+      this.cat_id = id;
+      this.name = name;
+    },
+    ConfirmDeleteItem() {
+      axios
+        .delete(process.env.VUE_APP_API_URL + "/category/" + this.cat_id, {
+          validateStatus: () => true,
+        })
+        .then((res) => {
           this.message = res.data.message;
-          if(res.data.id==1){
-            this.backgroundColor="green";
-          }else{
-            this.backgroundColor="green";
+          if (res.data.id == 1) {
+            this.backgroundColor = "green";
+          } else {
+            this.backgroundColor = "green";
           }
           this.snackbar = true;
           this.getCategory();
           this.CloseDailogDelete();
-        })
-      },
-      CloseFormAddEdit(){
-        this.dialog = false;
-        this.cat_id = 0;
-        this.name = "";
-        this.description = "";
-      },
-      CloseDailogDelete(){
-        this.dialogDelete = false;
-        this.CloseFormAddEdit();
-      }
+        });
     },
-    mounted(){
-      //this.getCategory();
-    }
-  }
+    CloseFormAddEdit() {
+      this.dialog = false;
+      this.cat_id = 0;
+      this.name = "";
+      this.description = "";
+    },
+    CloseDailogDelete() {
+      this.dialogDelete = false;
+      this.CloseFormAddEdit();
+    },
+  },
+  mounted() {
+    this.getUser();
+  },
+};
 </script>
