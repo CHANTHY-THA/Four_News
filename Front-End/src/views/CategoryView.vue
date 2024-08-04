@@ -1,6 +1,5 @@
 <template>
   <div>
-    <MenuComponent />
     <div style="padding: 20px; background: #e0e0e0; height: 100%">
       <!-- block rearch -->
       <div>
@@ -238,15 +237,13 @@
     </div>
   </div>
 </template>
-  <script>
+<script>
 import axios from "axios";
 import AlertMessage from "@/components/AlertMessage.vue";
-import MenuComponent from "@/components/MenuComponent.vue";
 
 export default {
   components: {
     AlertMessage,
-    MenuComponent,
   },
   data: () => ({
     headers: [

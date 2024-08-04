@@ -1,7 +1,5 @@
 <template>
   <div>
-    <MenuComponent />
-
     <div style="padding: 20px; background: #e0e0e0; height: 100%">
       <div style="margin-bottom: 30px">
         <!-- add and edit form -->
@@ -218,17 +216,15 @@
     </div>
   </div>
 </template>
-  <script>
+<script>
 import axios from "axios";
 import AlertMessage from "@/components/AlertMessage.vue";
-import MenuComponent from "@/components/MenuComponent.vue";
 // import AppLayout from "../layouts/AppLayout.vue";
 export default {
   name: "UserView",
   components: {
     AlertMessage,
     // AppLayout,
-    MenuComponent,
   },
   data: () => ({
     headers: [
