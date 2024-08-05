@@ -15,7 +15,7 @@
           <v-text
             v-if="!rail"
             style="font-weight: bold; font-size: 18px; margin-left: -15px"
-            >Suosdey Works</v-text
+            >Four News</v-text
           >
         </div>
       </div>
@@ -165,6 +165,11 @@ export default {
           title: "Leave Report",
           icon: "mdi-file-chart-outline",
           path: "/leave-report",
+        },
+        {
+          title: "News",
+          icon: "mdi-file-chart-outline",
+          path: "/news",
         },
         {
           title: "User",

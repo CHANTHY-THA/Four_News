@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import CategoryView from "../views/CategoryView.vue";
 import User from "../views/User.vue";
 import Login from "../views/Login.vue";
+import NewsView from "@/views/NewsView.vue";
 // import MenuBar from "../views/MenuBar.vue";
 // import { loadLayoutMiddleware } from '@/router/middleware/loadLayoutMiddleware';
 
@@ -11,6 +12,14 @@ const routes = [
     path: "/category",
     name: "category",
     component: CategoryView,
+    meta: {
+      layout: "AppLayout",
+    },
+  },
+  {
+    path: "/news",
+    name: "news",
+    component: NewsView,
     meta: {
       layout: "AppLayout",
     },
