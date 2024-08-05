@@ -60,25 +60,33 @@
                       </v-row>
                       <v-row style="margin-top: -15px;">
                         <v-col cols="6">
-                          <v-select :items="userList" :rules="[required]" item-title="username" v-model="authorSelected"
-                            label="Select author" color="primary" variant="outlined" persistent-hint return-object
+                          <v-select :items="authorList" :rules="[required]" item-title="username"
+                            v-model="authorSelected" label="Select author" color="primary" variant="outlined"
+                            persistent-hint return-object single-line></v-select>
+                        </v-col>
+                        <v-col cols="6">
+                          <v-select :items="tagList" :rules="[required]" item-title="name" v-model="tagSelected"
+                            label="Select tag" color="primary" variant="outlined" persistent-hint return-object
                             single-line></v-select>
+                        </v-col>
+                      </v-row>
+                      <v-row style="margin-top: -15px;">
+                        <v-col cols="6">
+                          <v-textarea v-model="content" :rules="[required]" hide-details="auto" label="Content"
+                            color="primary" rows="1" variant="outlined"></v-textarea>
                         </v-col>
                         <v-col cols="6">
                           <v-textarea v-model="short_description" hide-details="auto" label="Description"
                             color="primary" rows="1" variant="outlined"></v-textarea>
                         </v-col>
                       </v-row>
-                      <v-row style="margin-top: -15px;">
-                        <v-col cols="12">
-                          <v-textarea v-model="content" :rules="[required]" hide-details="auto" label="Content"
-                            color="primary" rows="1" variant="outlined"></v-textarea>
-                        </v-col>
-                      </v-row>
                       <v-row>
-                        <v-col cols="12">
-                          <v-file-input v-model="newImage" label="Image" color="primary"
+                        <v-col cols="6">
+                          <v-file-input v-model="selectedFile" @change="onFileChange" label="Image" color="primary"
                             variant="outlined"></v-file-input>
+                        </v-col>
+                        <v-col cols="6" v-if="image">
+                          <v-img :src="image" max-height="150px" max-width="150px"></v-img>
                         </v-col>
                       </v-row>
                     </v-form>
@@ -106,15 +114,20 @@
           :items-length="totalItems" :loading="loading" item-value="name" @update:options="loadItems">
           <template v-slot:item="{ item }">
             <tr>
-              <td style="width: 3%;">{{ item.ID }}</td>
-              <td style="width: 20%;">{{ item.title }}</td>
-              <td style="width: 20%;">{{ item.content }}</td>
+              <td style="width: 17%;"> <v-img :src="image" max-height="150px" max-width="170px"></v-img></td>
+              <td style="width: 20%;">
+                <h3>{{ item.title }}</h3>
+                <p style="margin-top: 10px;">{{ item.content }}</p>
+                <p style="margin-top: 5px;color: gray;">Author by: {{ item.author ? item.author.username : "" }}</p>
+              </td>
+              <!-- <td style="width: 20%;">{{ item.content }}</td> -->
               <td style="width: 20%;">{{ item.short_description }}</td>
+              <!-- <td>{{ item.author ? item.author.username : "" }}</td> -->
               <td>{{ item.created_by }}</td>
               <td>{{ item.created_at }}</td>
               <td>
                 <div class="d-flex justify-content-center">
-                  <div @click="EditCategory(item)" style="
+                  <div @click="EditNews(item)" style="
                       margin-right: 5px;
                       background: green;
                       border-radius: 50%;
@@ -128,7 +141,7 @@
                     <v-icon size="17" color="white"> mdi-pencil</v-icon>
                     <ToolTipMessage message="Edit Category"></ToolTipMessage>
                   </div>
-                  <div @click="DeleteCategory(item.ID, item.name)" style="
+                  <div @click="DeleteNewsByID(item)" style="
                       background: red;
                       border-radius: 50%;
                       width: 30px;
@@ -149,15 +162,15 @@
       </v-card>
 
       <!-- delete news by ID -->
-      <v-dialog v-model="dialogDelete" persistent max-width="500px">
+      <v-dialog v-model="dialogDelete" persistent max-width="700px">
         <v-card>
-          <v-card-title class=" " primary-title> Delete Category </v-card-title>
+          <v-card-title primary-title> Delete News </v-card-title>
           <hr />
           <v-card-text>
             <v-container>
               <v-row>
                 <p>
-                  Are you sure, you want to delete category <q>{{ title }}</q> ?
+                  Are you sure to delete <q>{{ title }}</q> ?
                 </p>
               </v-row>
             </v-container>
@@ -167,10 +180,11 @@
               margin-bottom: 20px;
               margin-top: 0px;
             ">
-            <v-btn style="background-color: red; color: white" variant="text" @click="CloseDailogDelete">
+            <v-btn style="background-color: gray; color: white" variant="text" @click="CloseDailogDelete">
               No
             </v-btn>
-            <v-btn class="bg-info" style="background-color: rgb(8, 88, 145); color: white" @click="ConfirmDeleteItem">
+            <v-btn class="bg-info" style="background-color: rgb(8, 88, 145); color: white; margin-left: 5%;"
+              @click="ConfirmDeleteItem">
               Yes
             </v-btn>
           </v-card-actions>
@@ -194,20 +208,25 @@ export default {
   },
   data: () => ({
     headers: [
-      { title: "No", align: "", sortable: false, key: "ID" },
+      { title: "", align: "", sortable: false, },
       { title: "Title", sortable: false, key: "name" },
-      { title: "Content", sortable: false, key: "content" },
+      // { title: "Content", sortable: false, key: "content" },
       { title: "Description", sortable: false, key: "description" },
+      // { title: "Author By", sortable: false, key: "author" },
       { title: "Created By", sortable: false, key: "created_by" },
       { title: "Created At", sortable: false, key: "created_at" },
       { title: "Action", sortable: false },
     ],
+
+    newsID: 0,
     title: "",
     categorySelected: null,
     authorSelected: null,
-    newImage: "",
+    tagSelected: null,
     content: "",
     short_description: "",
+    image: null,
+    selectedFile: null,
 
     NewsForm: false,
     dialog: false,
@@ -215,7 +234,9 @@ export default {
     dialogDelete: false,
     newsList: [],
     userList: [["All"]],
+    authorList: [],
     categoryList: [],
+    tagList: [],
     loading: true,
     totalItems: 0,
     cat_id: 0,
@@ -315,6 +336,16 @@ export default {
       });
     },
 
+    // get Author List
+    getAuthorList() {
+      this.authorList = [];
+      axios.get(process.env.VUE_APP_API_URL + "/authors").then((res) => {
+        if (res.data.data.authors.length > 0) {
+          this.authorList = res.data.data.authors;
+        }
+      });
+    },
+
     // get Category List
     getCategoryList() {
       this.categoryList = [];
@@ -322,41 +353,81 @@ export default {
         if (res.data.data.categories.length > 0) {
           this.categoryList = res.data.data.categories;
         }
-
-        console.log(this.categoryList);
       });
     },
 
-    EditCategory(cat) {
+    // get Tag List
+    getTagList() {
+      this.tagList = [];
+      axios.get(process.env.VUE_APP_API_URL + "/tags").then((res) => {
+        if (res.data.data.tags.length > 0) {
+          this.tagList = res.data.data.tags;
+        }
+      });
+    },
+
+    // edit news by ID
+    EditNews(news) {
       this.dialog = true;
-      this.cat_id = cat.ID;
-      this.name = cat.name;
-      this.description = cat.description;
+      this.newsID = news.ID;
+      this.categorySelected = news.category;
+      this.authorSelected = news.author;
+      // this.tagSelected = news.tag;
+      this.title = news.title;
+      this.content = news.content;
+      this.short_description = news.short_description;
+      this.image = news.image;
+    },
+
+    DeleteNewsByID(news) {
+      this.dialogDelete = true;
+      this.newsID = news.ID;
+      this.title = news.title;
+    },
+
+    // select image
+    onFileChange(e) {
+      const file = e.target.files[0];
+      if (file) {
+        this.image = URL.createObjectURL(file);
+
+        console.log("Image: ", this.image);
+      } else {
+        this.image = null;
+      }
     },
 
     // Save News
     SaveNews() {
       let news = {
-        userId: 1,
+        id: this.newsID,
+        userId: 5,
         categoryId: this.categorySelected.ID,
         authorId: this.authorSelected.ID,
+        tagId: this.tagSelected.ID,
         title: this.title,
         content: this.content,
         short_description: this.short_description,
-        image: this.newImage.name,
+        image: this.image,
         created_by: "Chanthy tha",
         updated_by: "Chanthy tha",
         updated_at: new Date()
-        
+
       };
 
       console.log(news);
 
-      axios.post(process.env.VUE_APP_API_URL + "/news", news, { validateStatus: () => true, }).then((res) => {
-        this.message = res.data.message;
-        this.AddUpdateData(res.data.id);
-      });
-
+      if (this.newsID > 0) {
+        axios.put(process.env.VUE_APP_API_URL + "/news", news, { validateStatus: () => true, }).then((res) => {
+          this.message = res.data.message;
+          this.AddUpdateData(res.data.id);
+        });
+      } else {
+        axios.post(process.env.VUE_APP_API_URL + "/news", news, { validateStatus: () => true, }).then((res) => {
+          this.message = res.data.message;
+          this.AddUpdateData(res.data.id);
+        });
+      }
     },
 
     AddUpdateData(res_id) {
@@ -370,15 +441,10 @@ export default {
       this.CloseFormAddEdit();
     },
 
-    DeleteCategory(id, name) {
-      this.dialogDelete = true;
-      this.cat_id = id;
-      this.name = name;
-    },
-
+    // delete news by ID
     ConfirmDeleteItem() {
       axios
-        .delete(process.env.VUE_APP_API_URL + "/category/" + this.cat_id, {
+        .delete(process.env.VUE_APP_API_URL + "/news/" + this.newsID, {
           validateStatus: () => true,
         })
         .then((res) => {
@@ -411,6 +477,8 @@ export default {
   mounted() {
     this.getUser();
     this.getCategoryList();
+    this.getAuthorList();
+    this.getTagList();
   },
 
 };

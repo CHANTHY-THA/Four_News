@@ -40,7 +40,7 @@ const getAuthors = async (req, res) => {
             total_page: total_page,
             has_next: page < total_page
         }
-        return new Response(res).setResponse({ tags: result, pagination: pagination }).setID(1).send();
+        return new Response(res).setResponse({ authors: result, pagination: pagination }).setID(1).send();
 
     } catch (err) {
         console.log("Error getAuthors:" + err.message);
