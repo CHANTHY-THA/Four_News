@@ -5,29 +5,28 @@ const authMiddleware = (req, res, next) => {
   // protec this route only for logged in users
   // header "Authorization": "Bearer dfdsffdfddfsdkfjdsjfdsjlkfdsf"
   let authHeader = req.headers.authorization;
-  next();
-  // if (!authHeader) {
-  //   return res.status(401).send({ message: "Unauthorized" });
-  // }
-  // if (!authHeader.startsWith("Bearer ")) {
-  //   return res.status(401).send({ message: "Bad header" });
-  // }
-  // const token = authHeader.split(" ")[1];
+  // next();
+  if (!authHeader) {
+    return res.status(401).send({ message: "Unauthorized" });
+  }
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).send({ message: "Bad header" });
+  }
+  const token = authHeader.split(" ")[1];
 
-  // if (token) {
-  //   // verify token
-  //   // if token is valid, continue
-  //   try {
+  if (token) {
+    // verify token
+    // if token is valid, continue
+    try {
 
-  //     const payload = jwtLib.verifyToken(token);
-  //     console.log({ payload });
-  //     req.user = payload.user;
-  //     next();
-  //   } catch (error) {
-  //     console.log({ error });
-  //     return res.status(401).send({ message: "Invalid token" });
-  //   }
-  // }
+      const payload = jwtLib.verifyToken(token);
+      req.user = payload.user;
+      next();
+    } catch (error) {
+      console.log({ error });
+      return res.status(401).send({ message: "Invalid token" });
+    }
+  }
 };
 
 module.exports = authMiddleware;

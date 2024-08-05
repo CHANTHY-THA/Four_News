@@ -298,9 +298,13 @@ export default {
       }
     },
     getCategory() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       const params = { page: this.page, itemPerPage: this.itemsPerPage };
       axios
-        .get(process.env.VUE_APP_API_URL + "/categories", { params })
+        .get(process.env.VUE_APP_API_URL + "/categories", { params, headers })
         .then((res) => {
           this.categoryList = res.data.data.categories;
           this.totalItems = res.data.data.pagination.total_record;
@@ -326,10 +330,14 @@ export default {
           description: this.s_descrition,
           created_by: this.username,
         };
+        let token = localStorage.getItem("authToken");
+        let headers = {
+          Authorization: `Bearer ${token}`,
+        };
         axios
           .get(
             process.env.VUE_APP_API_URL + "/categories/filter",
-            { params },
+            { params, headers },
             { validateStatus: () => false }
           )
           .then((res) => {
@@ -344,13 +352,19 @@ export default {
       }
     },
     getUser() {
-      axios.get(process.env.VUE_APP_API_URL + "/users").then((res) => {
-        let users = res.data.data.users;
-        users.forEach((user) => {
-          this.userList.push(user);
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      axios
+        .get(process.env.VUE_APP_API_URL + "/users", { headers })
+        .then((res) => {
+          let users = res.data.data.users;
+          users.forEach((user) => {
+            this.userList.push(user);
+          });
+          // this.userSelected = this.userList[0];
         });
-        // this.userSelected = this.userList[0];
-      });
     },
     EditCategory(cat) {
       this.dialog = true;
@@ -364,20 +378,34 @@ export default {
         name: this.name,
         description: this.description,
       };
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       if (this.cat_id > 0) {
         axios
-          .put(process.env.VUE_APP_API_URL + "/category", category, {
-            validateStatus: () => true,
-          })
+          .put(
+            process.env.VUE_APP_API_URL + "/category",
+            category,
+            { headers },
+            {
+              validateStatus: () => true,
+            }
+          )
           .then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
           });
       } else {
         axios
-          .post(process.env.VUE_APP_API_URL + "/category", category, {
-            validateStatus: () => true,
-          })
+          .post(
+            process.env.VUE_APP_API_URL + "/category",
+            category,
+            { headers },
+            {
+              validateStatus: () => true,
+            }
+          )
           .then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
@@ -400,10 +428,18 @@ export default {
       this.name = name;
     },
     ConfirmDeleteItem() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       axios
-        .delete(process.env.VUE_APP_API_URL + "/category/" + this.cat_id, {
-          validateStatus: () => true,
-        })
+        .delete(
+          process.env.VUE_APP_API_URL + "/category/" + this.cat_id,
+          { headers },
+          {
+            validateStatus: () => true,
+          }
+        )
         .then((res) => {
           this.message = res.data.message;
           if (res.data.id == 1) {

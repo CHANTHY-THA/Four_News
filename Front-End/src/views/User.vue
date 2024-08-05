@@ -267,9 +267,18 @@ export default {
       this.getUser();
     },
     getUser() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       const params = { page: this.page, itemPerPage: this.itemsPerPage };
       axios
-        .get(process.env.VUE_APP_API_URL + "/users", { params })
+        .get(
+          process.env.VUE_APP_API_URL + "/users",
+          { headers, params },
+
+          { validateStatus: () => true }
+        )
         .then((res) => {
           this.userList = res.data.data.users;
           console.log(
@@ -294,11 +303,16 @@ export default {
         password: this.password,
         role: this.role,
       };
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       if (this.user_id > 0) {
         axios
           .patch(
             process.env.VUE_APP_API_URL + "/username/" + this.user_id,
             user,
+            { headers },
             {
               validateStatus: () => true,
             }
@@ -309,9 +323,14 @@ export default {
           });
       } else {
         axios
-          .post(process.env.VUE_APP_API_URL + "/user", user, {
-            validateStatus: () => true,
-          })
+          .post(
+            process.env.VUE_APP_API_URL + "/user",
+            user,
+            { headers },
+            {
+              validateStatus: () => true,
+            }
+          )
           .then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
@@ -334,12 +353,18 @@ export default {
       this.username = username;
     },
     ConfirmDeleteItem() {
-      console.log("id: " + this.user_id);
-      console.log("username: " + this.username);
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       axios
-        .delete(process.env.VUE_APP_API_URL + "/user/" + this.user_id, {
-          validateStatus: () => true,
-        })
+        .delete(
+          process.env.VUE_APP_API_URL + "/user/" + this.user_id,
+          { headers },
+          {
+            validateStatus: () => true,
+          }
+        )
         .then((res) => {
           this.message = res.data.message;
           if (res.data.id == 1) {

@@ -45,7 +45,6 @@ const login = async (req, res) => {
 
 const getUser = async (req, res) => {
 
-    console.log(res.user);
 
     try {
         const loginId = req.user.ID;
@@ -54,7 +53,7 @@ const getUser = async (req, res) => {
         });
         const dateFormat = dayjs(foundUser.created);
         foundUser.created = dateFormat.format("DD-MMM-YYYY")
-        foundUser.profile = `http://localhost:8080/api/image/${getProfile(foundUser.profile)}`
+        foundUser.profile = `http://localhost:${process.env.PORT}/api/image/${getProfile(foundUser.profile)}`
         const { password: _, ...noPassUserData } = foundUser;
 
         return res.status(200).send({ result: noPassUserData, message: "found user" });
@@ -70,7 +69,7 @@ const getUser = async (req, res) => {
 function getProfile(profile) {
 
     if (profile === null) {
-        return "profile.png";
+        return "default-profile.jpg";
     } else {
         return profile;
     }
