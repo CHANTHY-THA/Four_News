@@ -1,19 +1,22 @@
 <template>
   <div class="custom-main-padding">
-    <div class="title">
-      <h1>Author</h1>
-    </div>
     <div>
-      <div style="margin-bottom: 30px">
+      <div>
         <!-- add and edit form -->
         <v-dialog
           v-model="dialog"
           persistent
           transition="dialog-center-transition"
           max-width="500px"
+          class="custom-add-dialog"
         >
           <template v-slot:activator="{ props }">
-            <v-btn color="info" dark class="mb-2 float-right" v-bind="props">
+            <v-btn
+              color="info"
+              dark
+              class="mb-2 float-right i-btn-add"
+              v-bind="props"
+            >
               Add User
               <!-- <ToolTipMessage message="Add New User"></ToolTipMessage> -->
             </v-btn>
@@ -109,61 +112,33 @@
       <v-data-table-server
         v-model:items-per-page="itemsPerPage"
         :headers="headers"
-        :items="userList"
+        :items="authorList"
         :items-length="totalItems"
         :loading="loading"
         item-value="username"
         @update:options="loadItems"
+        class="custom-table"
       >
         <template v-slot:top>
-          <v-toolbar
-            flat
-            color="white"
-            style="
-              border-bottom: 1px solid rgba(128, 128, 128, 0.577);
-              display: flex;
-              justify-content: space-between;
-            "
-          >
-            <v-toolbar-title>User List</v-toolbar-title>
+          <v-toolbar flat color="white" class="custom-toolbar">
+            <v-toolbar-title>Author List</v-toolbar-title>
           </v-toolbar>
         </template>
         <template v-slot:item="{ item }">
           <tr>
             <td>{{ item.ID }}</td>
             <td>{{ item.username }}</td>
-            <!-- <td>{{ item.password }}</td> -->
-            <td>{{ item.role }}</td>
+            <td>{{ item.biography }}</td>
             <td>{{ item.created_at }}</td>
             <td>
               <div class="d-flex">
-                <div
-                  @click="EditUser(item)"
-                  style="
-                    margin-right: 5px;
-                    background: green;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
-                >
+                <div @click="EditUser(item)" class="custom-edit">
                   <v-icon size="17" color="white"> mdi-pencil</v-icon>
                   <ToolTipMessage message="Edit User"></ToolTipMessage>
                 </div>
                 <div
                   @click="DeleteUser(item.ID, item.username)"
-                  style="
-                    background: red;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
+                  class="custom-delete"
                 >
                   <v-icon size="17" color="white"> mdi-delete</v-icon>
                 </div>
@@ -233,8 +208,8 @@ export default {
     headers: [
       { title: "ID", align: "", sortable: false, key: "ID" },
       { title: "username", sortable: false, key: "username" },
+      { title: "biography", sortable: false, key: "biography" },
       // { title: "password", sortable: false, key: "password" },
-      { title: "role", sortable: false, key: "role" },
       { title: "CreatedAt", sortable: false, key: "created_at" },
       { title: "Action", sortable: false },
     ],
@@ -245,7 +220,7 @@ export default {
     dialog: false,
     snackbar: false,
     dialogDelete: false,
-    userList: [],
+    authorList: [],
     loading: true,
     totalItems: 0,
     user_id: 0,
@@ -275,10 +250,10 @@ export default {
         .get(process.env.VUE_APP_API_URL + "/authors", { params })
         .then((res) => {
           console.log("authors:", res);
-          this.userList = res.data.data.authors;
+          this.authorList = res.data.data.authors;
           console.log(
-            "🚀 ~ file: User.vue:279 ~ .then ~ userList:",
-            this.userList
+            "🚀 ~ file: User.vue:279 ~ .then ~ authorList:",
+            this.authorList
           );
           this.totalItems = res.data.data.pagination.total_record;
           this.loading = false;

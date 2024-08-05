@@ -1,3 +1,5 @@
+@import "../_variables.scss";
+
 // sidebar style
 .logo .v-img__img--cover {
   object-fit: fill;
@@ -16,4 +18,40 @@
   padding: 10px;
 }
 
+// custom-add-dialog
+.custom-add-dialog {
+}
+.i-btn-add {
+  margin-bottom: 20px !important;
+  border-radius: 10px;
+  height: calc(var(--v-btn-height) + 5px) !important;
+}
 // custom table style
+.custom-table {
+  border-radius: $bordeRadius !important;
+  overflow: hidden;
+  .custom-toolbar {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.577);
+    display: flex;
+    justify-content: space-between;
+  }
+  .custom-edit {
+    margin-right: 5px;
+    background: green;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    align-items: center !important;
+    display: flex;
+    justify-content: center !important;
+  }
+  .custom-delete {
+    background: red;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    align-items: center !important;
+    display: flex;
+    justify-content: center !important;
+  }
+}
