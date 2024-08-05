@@ -62,6 +62,16 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to) => {
+
+  let token = localStorage.getItem("authToken");
+  if (to.fullPath != "/" && !token) {
+    return "/"
+  } else if (to.fullPath == "/" && token) {
+    return "/category"
+  }
+})
+
 // router.beforeEach(loadLayoutMiddleware)
 
 export default router;
