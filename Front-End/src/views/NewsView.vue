@@ -337,20 +337,25 @@ export default {
     // Save News
     SaveNews() {
       let news = {
+        userId: 1,
         categoryId: this.categorySelected.ID,
         authorId: this.authorSelected.ID,
         title: this.title,
         content: this.content,
         short_description: this.short_description,
-        image: this.newImage,
+        image: this.newImage.name,
+        created_by: "Chanthy tha",
+        updated_by: "Chanthy tha",
+        updated_at: new Date()
+        
       };
 
       console.log(news);
 
-      // axios.post(process.env.VUE_APP_API_URL + "/news", news, { validateStatus: () => true, }).then((res) => {
-      //   this.message = res.data.message;
-      //   this.AddUpdateData(res.data.id);
-      // });
+      axios.post(process.env.VUE_APP_API_URL + "/news", news, { validateStatus: () => true, }).then((res) => {
+        this.message = res.data.message;
+        this.AddUpdateData(res.data.id);
+      });
 
     },
 
