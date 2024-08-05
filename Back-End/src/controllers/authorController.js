@@ -31,6 +31,14 @@ const getAuthors = async (req, res) => {
       result.push(t);
     });
 
+    totalRecordPerPage.forEach((t) => {
+      const createdAtFormat = dayjs(t.created_at);
+      const updatedAtFormat = dayjs(t.updated_at);
+      t.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
+      t.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+      result.push(t);
+    });
+
     const total_page = Math.ceil(totalRecord.length / limit);
     const pagination = {
       total_record: totalRecord.length,

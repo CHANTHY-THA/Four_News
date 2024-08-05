@@ -1,12 +1,13 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const categoryRoute = require("./routes/categoryRoutes");
-const tagRoute = require("./routes/tagRoutes");
-const authorRoute = require("./routes/authorRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const tagRoutes = require("./routes/tagRoutes");
+const authorRoutes = require("./routes/authorRoutes");
 const newsRoutes = require("./routes/newsRoutes");
-const userRoute = require("./routes/userRoutes");
-const authRoute = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
 const newsTagRoutes = require("./routes/newstagRoutes");
+const imageRoutes = require("./routes/imageRoutes");
 var cors = require('cors');
 
 
@@ -20,13 +21,15 @@ router.use(cors({
     origin: '*'
 }));
 
-router.use("/api", categoryRoute);
-router.use("/api", tagRoute);
-router.use("/api", authorRoute);
+router.use("/api", categoryRoutes);
+router.use("/api", tagRoutes);
+router.use("/api", authorRoutes);
 router.use("/api", newsRoutes);
 router.use("/api", newsTagRoutes);
-router.use("/api", userRoute);
-router.use("/api", authRoute);
+router.use("/api", userRoutes);
+router.use("/api", authRoutes);
+router.use("/api", imageRoutes);
+
 
 
 
