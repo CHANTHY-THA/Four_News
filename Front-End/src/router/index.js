@@ -54,6 +54,17 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to) => {
+
+  let token = localStorage.getItem("authToken");
+  if (to.fullPath != "/" && !token) {
+    return "/"
+  } else if (to.fullPath == "/" && token) {
+    return "/category"
+  }
+})
+
+// router.beforeEach(loadLayoutMiddleware)
 // router.beforeEach((to, from, next) => {
 //   const isAuthenticated = false; // Replace with actual auth check
 //   if (to.name !== "login" && !isAuthenticated) next({ name: "login" });

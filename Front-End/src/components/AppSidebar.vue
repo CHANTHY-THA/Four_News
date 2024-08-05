@@ -192,7 +192,7 @@ export default {
       userID: null,
       user: [{}],
       initails: "",
-      username: "",
+      username: "Pros Nob",
       com_logo: "",
     };
   },
