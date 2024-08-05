@@ -286,6 +286,72 @@ const updateUsername = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const body = req.body;
+        let id = parseInt(req.params.id);
+        const { username, role } = body;
+
+        if (isNaN(id)) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(400)
+                .setMessage("ID must be a number.")
+                .send();
+        }
+
+        if (!username) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(400)
+                .setMessage("Username is required.")
+                .send();
+        }
+
+        const foundUser = await prisma.users.findFirst({
+            where: { ID: id, status: 1 },
+        });
+        if (!foundUser) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(404)
+                .setMessage("No data found.")
+                .send();
+        }
+
+        const checkRecordExist = await prisma.users.findFirst({
+            where: { username: username },
+        });
+
+        if (checkRecordExist && checkRecordExist?.ID != id) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(400)
+                .setMessage("Username already exist.")
+                .send();
+        } else {
+            await prisma.users.update({
+                where: { ID: id },
+                data: {
+                    username: username,
+                    role: role
+                },
+            });
+            return new Response(res)
+                .setID(1)
+                .setMessage("User updated successfully.")
+                .send();
+        }
+    } catch (err) {
+        console.log("Error updateUser:" + err.message);
+        return new Response(res)
+            .setID(0)
+            .setStatusCode(500)
+            .setMessage("Something went wrong.")
+            .send();
+    }
+};
+
 const updatePassword = async (req, res) => {
     try {
         const body = req.body;
@@ -421,4 +487,5 @@ module.exports = {
     getUserByID,
     deleteUser,
     getUserByFilter,
+    updateUser
 };

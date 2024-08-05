@@ -51,6 +51,7 @@
                         label="Password"
                         color="primary"
                         variant="outlined"
+                        type="password"
                       ></v-text-field>
 
                       <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
@@ -60,20 +61,11 @@
                   </v-row>
                   <v-row style="margin-top: -15px">
                     <v-col cols="12">
-                      <!-- <v-text-field
-                        v-model="role"
-                        :rules="[required]"
-                        density="compact"
-                        label="Role"
-                        color="primary"
-                        variant="outlined"
-                      ></v-text-field> -->
-
                       <v-select
                         v-model="role"
-                        item-text="role"
-                        item-value="role"
                         :items="roleList"
+                        :item-props="itemProps"
+                        item-value="role"
                         :rules="[required]"
                         density="compact"
                         label="Role"
@@ -328,9 +320,10 @@ export default {
         Authorization: `Bearer ${token}`,
       };
       if (this.user_id > 0) {
+        delete user.password;
         axios
           .patch(
-            process.env.VUE_APP_API_URL + "/username/" + this.user_id,
+            process.env.VUE_APP_API_URL + "/user/" + this.user_id,
             user,
             { headers },
             {
@@ -407,6 +400,11 @@ export default {
     CloseDailogDelete() {
       this.dialogDelete = false;
       this.CloseFormAddEdit();
+    },
+    itemProps(item) {
+      return {
+        title: item.role,
+      };
     },
   },
   mounted() {
