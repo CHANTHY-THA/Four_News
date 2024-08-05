@@ -7,6 +7,8 @@ const newsRoutes = require("./routes/newsRoutes");
 const userRoute = require("./routes/userRoutes");
 const authRoute = require("./routes/authRoutes");
 const newsTagRoutes = require("./routes/newstagRoutes");
+
+const settingRoutes = require("./routes/settingRoutes");
 var cors = require('cors');
 
 
@@ -27,6 +29,8 @@ router.use("/api", newsRoutes);
 router.use("/api", newsTagRoutes);
 router.use("/api", userRoute);
 router.use("/api", authRoute);
+
+router.use("/api", settingRoutes);
 
 
 

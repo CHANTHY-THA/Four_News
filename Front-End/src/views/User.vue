@@ -62,14 +62,26 @@
                   </v-row>
                   <v-row style="margin-top: -15px">
                     <v-col cols="12">
-                      <v-text-field
+                      <!-- <v-text-field
                         v-model="role"
                         :rules="[required]"
                         density="compact"
                         label="Role"
                         color="primary"
                         variant="outlined"
-                      ></v-text-field>
+                      ></v-text-field> -->
+
+                      <v-select
+                        v-model="role"
+                        item-text="role"
+                        item-value="role"
+                        :items="roleList"
+                        :rules="[required]"
+                        density="compact"
+                        label="Role"
+                        color="primary"
+                        variant="outlined"
+                      ></v-select>
 
                       <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
                     <small :style="{color:colorMessage}">{{message}}</small>
@@ -255,6 +267,7 @@ export default {
     backgroundColor: "",
     page: 1,
     itemsPerPage: process.env.VUE_APP_ITEM_PER_PAGE,
+    roleList: [],
   }),
   computed: {
     formTitle() {
@@ -272,6 +285,13 @@ export default {
     },
     getUser() {
       const params = { page: this.page, itemPerPage: this.itemsPerPage };
+      axios.get(process.env.VUE_APP_API_URL + "/setting").then((res) => {
+        this.roleList = res.data.data.role;
+        console.log(
+          "🚀 ~ file: User.vue:123~ .then ~ setting:",
+          res.data.data.role
+        );
+      });
       axios
         .get(process.env.VUE_APP_API_URL + "/users", { params })
         .then((res) => {
