@@ -136,6 +136,7 @@
 // import JsonData from "@/assets/data.json";
 // import logo from "@/assets/profiles/sdworks.png";
 export default {
+  name: "AppSidebar",
   props: ["title"],
   data() {
     return {
@@ -165,6 +166,11 @@ export default {
           title: "Leave Report",
           icon: "mdi-file-chart-outline",
           path: "/leave-report",
+        },
+        {
+          title: "News",
+          icon: "mdi-file-chart-outline",
+          path: "/news",
         },
         {
           title: "User",
