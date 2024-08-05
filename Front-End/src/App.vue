@@ -1,18 +1,7 @@
 <template>
-  <v-app>
-    <MenuComponent />
-    <v-main>
-      <router-view />
-    </v-main>
-  </v-app>
+  <router-view />
 </template>
 
 <script>
-import MenuComponent from "./components/MenuComponent.vue";
-
-export default {
-  components: {
-    MenuComponent,
-  },
-};
+export default {};
 </script>

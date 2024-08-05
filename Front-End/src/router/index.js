@@ -1,59 +1,45 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import DefaultLayout from "../layouts/DefaultLayout.vue";
+import LoginLayout from "../layouts/LoginLayout.vue";
+
 import CategoryView from "../views/CategoryView.vue";
-import User from "../views/User.vue";
-import Login from "../views/Login.vue";
-// import MenuBar from "../views/MenuBar.vue";
-// import { loadLayoutMiddleware } from '@/router/middleware/loadLayoutMiddleware';
+import UserView from "../views/User.vue";
+import HomeView from "../views/HomeView.vue";
+
+import LoginView from "../views/Login.vue";
 
 const routes = [
   {
-    path: "/category",
-    name: "category",
-    component: CategoryView,
-    meta: {
-      layout: "AppLayout",
-    },
+    path: "/",
+    component: LoginLayout,
+    children: [
+      {
+        path: "",
+        name: "login",
+        component: LoginView,
+      },
+    ],
   },
-  {
-    path: "/home",
-    name: "home",
-    component: HomeView,
-  },
-  {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-  },
-  {
-    path: "/user",
-    name: "user",
-
-    component: User,
-    meta: {
-      layout: "AppLayout",
-    },
-  },
-  // {
-  //   path: '/',
-  //   name: 'menu',
-  //   component: MenuBar,
-  //   meta: {
-  //     layout: 'AppLayout'
-  //   }
-
-  // },
   {
     path: "/",
-    name: "login",
-    component: Login,
-    meta: {
-      layout: "AppLayout",
-    },
+    component: DefaultLayout,
+    children: [
+      {
+        path: "category",
+        name: "category",
+        component: CategoryView,
+      },
+      {
+        path: "user",
+        name: "user",
+        component: UserView,
+      },
+      {
+        path: "home",
+        name: "home",
+        component: HomeView,
+      },
+    ],
   },
 ];
 
@@ -62,6 +48,10 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(loadLayoutMiddleware)
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = false; // Replace with actual auth check
+//   if (to.name !== "login" && !isAuthenticated) next({ name: "login" });
+//   else next();
+// });
 
 export default router;

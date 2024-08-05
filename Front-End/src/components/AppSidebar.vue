@@ -136,6 +136,7 @@
 // import JsonData from "@/assets/data.json";
 // import logo from "@/assets/profiles/sdworks.png";
 export default {
+  name: "AppSidebar",
   props: ["title"],
   data() {
     return {
