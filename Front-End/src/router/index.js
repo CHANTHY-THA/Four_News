@@ -8,6 +8,7 @@ import HomeView from "../views/HomeView.vue";
 import AuthorView from "../views/Author.vue";
 
 import LoginView from "../views/Login.vue";
+import NewsView from "@/views/NewsView.vue";
 
 const routes = [
   {
@@ -29,6 +30,11 @@ const routes = [
         path: "category",
         name: "category",
         component: CategoryView,
+      },
+      {
+        path: "news",
+        name: "news",
+        component: NewsView,
       },
       {
         path: "user",
@@ -54,6 +60,17 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to) => {
+
+  let token = localStorage.getItem("authToken");
+  if (to.fullPath != "/" && !token) {
+    return "/"
+  } else if (to.fullPath == "/" && token) {
+    return "/category"
+  }
+})
+
+// router.beforeEach(loadLayoutMiddleware)
 // router.beforeEach((to, from, next) => {
 //   const isAuthenticated = false; // Replace with actual auth check
 //   if (to.name !== "login" && !isAuthenticated) next({ name: "login" });

@@ -24,6 +24,7 @@
                   label="Username"
                   color="primary"
                   variant="outlined"
+                  v-on:keyup.enter="Login"
                 ></v-text-field>
 
                 <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
@@ -41,6 +42,7 @@
                   color="primary"
                   variant="outlined"
                   type="password"
+                  v-on:keyup.enter="Login"
                 ></v-text-field>
 
                 <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
@@ -117,9 +119,10 @@ export default {
           validateStatus: () => true,
         })
         .then((res) => {
-          console.log("🚀 ~ file: Login.vue:120 ~ .then ~ res:", res);
           this.backgroundColor = "red";
           if (res.data.statusCode == 200) {
+            localStorage.setItem("authToken", res.data.result.token);
+            this.$router.push(`/category`);
             this.username = "";
             this.password = "";
             this.backgroundColor = "green";
