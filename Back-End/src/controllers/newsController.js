@@ -25,7 +25,7 @@ const getNews = async (req, res) => {
       },
       skip: recordSkip,
       take: limit,
-      orderBy: { ID: "desc" },
+      orderBy: { updated_at: "desc" },
     });
 
     newsList.forEach((cat) => {
@@ -184,6 +184,7 @@ const addNews = async (req, res) => {
       image,
       short_description,
       content,
+      created_by,
       tagId
     } = body;
 
@@ -197,6 +198,7 @@ const addNews = async (req, res) => {
     const foundNews = await prisma.News.findFirst({
       where: { title: title },
     });
+
     if (!foundNews) {
       const news = await prisma.News.create({
         data: {
@@ -207,7 +209,7 @@ const addNews = async (req, res) => {
           image: image,
           short_description: short_description,
           content: content,
-          created_by: req.user.username,
+          created_by: created_by,
         },
       });
 
@@ -230,6 +232,7 @@ const addNews = async (req, res) => {
       .setStatusCode(400)
       .setMessage("News already exist.")
       .send();
+
   } catch (err) {
     console.log("Error addNews:" + err.message);
     return new Response(res)
@@ -252,6 +255,7 @@ const updateNews = async (req, res) => {
       image,
       short_description,
       content,
+      updated_by
     } = body;
 
     if (!title) {
@@ -295,7 +299,7 @@ const updateNews = async (req, res) => {
           image,
           short_description,
           content,
-          updated_by: req.user.username
+          updated_by
         },
       });
       return new Response(res)

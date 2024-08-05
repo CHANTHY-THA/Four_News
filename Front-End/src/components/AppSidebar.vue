@@ -15,7 +15,7 @@
           <v-text
             v-if="!rail"
             style="font-weight: bold; font-size: 18px; margin-left: -15px"
-            >Suosdey Works</v-text
+            >Four News</v-text
           >
         </div>
       </div>
@@ -75,12 +75,8 @@
         <v-menu color="grey-darken-4">
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props">
-              <v-avatar v-if="user[0].ProfileImage != ''" size="40px">
-                <v-img
-                  :src="`images/${user[0].ProfileImage}`"
-                  :alt="selectedDog"
-                  style=""
-                ></v-img>
+              <v-avatar v-if="userImage != ''" size="40px">
+                <v-img :src="userImage" :alt="selectedDog" style=""></v-img>
               </v-avatar>
               <v-avatar size="40px" color="info" v-else>
                 <span style="font-size: 20px">{{ this.initails }}</span>
@@ -135,7 +131,9 @@
 <script>
 // import JsonData from "@/assets/data.json";
 // import logo from "@/assets/profiles/sdworks.png";
+import axios from "axios";
 export default {
+  name: "AppSidebar",
   props: ["title"],
   data() {
     return {
@@ -167,6 +165,11 @@ export default {
           path: "/leave-report",
         },
         {
+          title: "News",
+          icon: "mdi-file-chart-outline",
+          path: "/news",
+        },
+        {
           title: "User",
           icon: "mdi-file-chart-outline",
           path: "/user",
@@ -187,6 +190,7 @@ export default {
       user: [{}],
       initails: "",
       username: "",
+      userImage: "",
       com_logo: "",
     };
   },
@@ -202,6 +206,21 @@ export default {
       //       this.user[0].FirstName[0].toUpperCase();
       //     this.username = this.user[0].LastName + " " + this.user[0].FirstName;
       //   }
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      axios
+        .get(
+          process.env.VUE_APP_API_URL + "/auth/user",
+          { headers },
+          { validateStatus: () => true }
+        )
+        .then((res) => {
+          this.username = res.data.result.username;
+          this.userImage = res.data.result.profile;
+        });
     },
 
     GetPath(path) {

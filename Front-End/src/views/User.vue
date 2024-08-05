@@ -1,7 +1,5 @@
 <template>
   <div>
-    <MenuComponent />
-
     <div style="padding: 20px; background: #e0e0e0; height: 100%">
       <div style="margin-bottom: 30px">
         <!-- add and edit form -->
@@ -230,17 +228,15 @@
     </div>
   </div>
 </template>
-  <script>
+<script>
 import axios from "axios";
 import AlertMessage from "@/components/AlertMessage.vue";
-import MenuComponent from "@/components/MenuComponent.vue";
 // import AppLayout from "../layouts/AppLayout.vue";
 export default {
   name: "UserView",
   components: {
     AlertMessage,
     // AppLayout,
-    MenuComponent,
   },
   data: () => ({
     headers: [
@@ -284,6 +280,10 @@ export default {
       this.getUser();
     },
     getUser() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       const params = { page: this.page, itemPerPage: this.itemsPerPage };
       axios.get(process.env.VUE_APP_API_URL + "/setting").then((res) => {
         this.roleList = res.data.data.role;
@@ -293,7 +293,12 @@ export default {
         );
       });
       axios
-        .get(process.env.VUE_APP_API_URL + "/users", { params })
+        .get(
+          process.env.VUE_APP_API_URL + "/users",
+          { headers, params },
+
+          { validateStatus: () => true }
+        )
         .then((res) => {
           this.userList = res.data.data.users;
           console.log(
@@ -318,11 +323,16 @@ export default {
         password: this.password,
         role: this.role,
       };
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       if (this.user_id > 0) {
         axios
           .patch(
             process.env.VUE_APP_API_URL + "/username/" + this.user_id,
             user,
+            { headers },
             {
               validateStatus: () => true,
             }
@@ -333,9 +343,14 @@ export default {
           });
       } else {
         axios
-          .post(process.env.VUE_APP_API_URL + "/user", user, {
-            validateStatus: () => true,
-          })
+          .post(
+            process.env.VUE_APP_API_URL + "/user",
+            user,
+            { headers },
+            {
+              validateStatus: () => true,
+            }
+          )
           .then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
@@ -358,12 +373,18 @@ export default {
       this.username = username;
     },
     ConfirmDeleteItem() {
-      console.log("id: " + this.user_id);
-      console.log("username: " + this.username);
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       axios
-        .delete(process.env.VUE_APP_API_URL + "/user/" + this.user_id, {
-          validateStatus: () => true,
-        })
+        .delete(
+          process.env.VUE_APP_API_URL + "/user/" + this.user_id,
+          { headers },
+          {
+            validateStatus: () => true,
+          }
+        )
         .then((res) => {
           this.message = res.data.message;
           if (res.data.id == 1) {
