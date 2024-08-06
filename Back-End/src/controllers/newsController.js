@@ -2,6 +2,8 @@ const Response = require("../responseBody/Response");
 const { PrismaClient } = require("@prisma/client");
 const dayjs = require("dayjs");
 const prisma = new PrismaClient();
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 const getNews = async (req, res) => {
   try {
@@ -125,7 +127,7 @@ const getNewsByFilter = async (req, res) => {
         author: true,
         user: true,
       },
-      
+
       where: {
         title: { contains: title },
         categoryId: category.ID,
@@ -184,7 +186,6 @@ const addNews = async (req, res) => {
       image,
       short_description,
       content,
-      created_by,
       tagId
     } = body;
 
@@ -199,6 +200,22 @@ const addNews = async (req, res) => {
       where: { title: title },
     });
 
+    const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        console.log("🚀 ~ file:", file)
+        cb(null, 'images/')
+      },
+      filename: (req, file, cb) => {
+        let filename = uuidv4().slice(-12);
+        filename = `${filename}_${file.originalname}`
+        cb(null, filename)
+      },
+    })
+
+    const upload = multer({ storage: storage })
+
+    console.log("Image: ", upload);
+
     if (!foundNews) {
       const news = await prisma.News.create({
         data: {
@@ -209,7 +226,8 @@ const addNews = async (req, res) => {
           image: image,
           short_description: short_description,
           content: content,
-          created_by: created_by,
+          created_by: req.user.username,
+          updated_by: req.user.username,
         },
       });
 
@@ -269,7 +287,7 @@ const updateNews = async (req, res) => {
     const foundNews = await prisma.News.findFirst({
       where: { ID: id, status: 1 },
     });
-    console.log("data: " + foundNews);
+    console.log("data: " , foundNews);
     if (!foundNews) {
       return new Response(res)
         .setID(0)
@@ -281,6 +299,22 @@ const updateNews = async (req, res) => {
     const checkRecordExist = await prisma.News.findFirst({
       where: { title: title },
     });
+
+    const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        console.log("🚀 ~ file:", file)
+        cb(null, 'images/')
+      },
+      filename: (req, file, cb) => {
+        let filename = uuidv4().slice(-12);
+        filename = `${filename}_${file.originalname}`
+        cb(null, filename)
+      },
+    })
+
+    const upload = multer({ storage: storage })
+
+    console.log("Upload: ", upload.single('file'));
 
     if (checkRecordExist && checkRecordExist?.ID != id) {
       return new Response(res)
@@ -296,7 +330,7 @@ const updateNews = async (req, res) => {
           authorId,
           userId,
           title,
-          image,
+          image: upload.single('file'),
           short_description,
           content,
           updated_by

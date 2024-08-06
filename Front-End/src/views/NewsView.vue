@@ -82,8 +82,8 @@
                       </v-row>
                       <v-row>
                         <v-col cols="6">
-                          <v-file-input v-model="selectedFile" @change="onFileChange" label="Image" color="primary"
-                            variant="outlined"></v-file-input>
+                          <v-file-input v-model="image" @change="onFileChange" label="Image" counter show-size
+                            small-chips color="primary" truncate-length="50" variant="outlined"></v-file-input>
                         </v-col>
                         <v-col cols="6" v-if="image">
                           <v-img :src="image" max-height="150px" max-width="150px"></v-img>
@@ -114,7 +114,9 @@
           :items-length="totalItems" :loading="loading" item-value="name" @update:options="loadItems">
           <template v-slot:item="{ item }">
             <tr>
-              <td style="width: 17%;"> <v-img :src="image" max-height="150px" max-width="170px"></v-img></td>
+              <td style="width: 17%;">
+                <img :src="news_url + item.image" max-height="150px" max-width="170px" alt="" />
+              </td>
               <td style="width: 20%;">
                 <h3>{{ item.title }}</h3>
                 <p style="margin-top: 10px;">{{ item.content }}</p>
@@ -226,7 +228,9 @@ export default {
     content: "",
     short_description: "",
     image: null,
+    imageUrl: null,
     selectedFile: null,
+    news_url: "http://127.0.0.1:8888/images/",
 
     NewsForm: false,
     dialog: false,
@@ -327,7 +331,12 @@ export default {
 
     // get User List
     getUser() {
-      axios.get(process.env.VUE_APP_API_URL + "/users").then((res) => {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      axios.get(process.env.VUE_APP_API_URL + "/users", { headers }).then((res) => {
         let users = res.data.data.users;
         users.forEach((user) => {
           this.userList.push(user);
@@ -338,8 +347,13 @@ export default {
 
     // get Author List
     getAuthorList() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
       this.authorList = [];
-      axios.get(process.env.VUE_APP_API_URL + "/authors").then((res) => {
+      axios.get(process.env.VUE_APP_API_URL + "/authors", { headers }).then((res) => {
         if (res.data.data.authors.length > 0) {
           this.authorList = res.data.data.authors;
         }
@@ -348,8 +362,13 @@ export default {
 
     // get Category List
     getCategoryList() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
       this.categoryList = [];
-      axios.get(process.env.VUE_APP_API_URL + "/categories").then((res) => {
+      axios.get(process.env.VUE_APP_API_URL + "/categories", { headers }).then((res) => {
         if (res.data.data.categories.length > 0) {
           this.categoryList = res.data.data.categories;
         }
@@ -358,8 +377,13 @@ export default {
 
     // get Tag List
     getTagList() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
       this.tagList = [];
-      axios.get(process.env.VUE_APP_API_URL + "/tags").then((res) => {
+      axios.get(process.env.VUE_APP_API_URL + "/tags", { headers }).then((res) => {
         if (res.data.data.tags.length > 0) {
           this.tagList = res.data.data.tags;
         }
@@ -386,19 +410,23 @@ export default {
     },
 
     // select image
-    onFileChange(e) {
-      const file = e.target.files[0];
+    onFileChange(event) {
+      let file = event.target.files[0];
+      this.image = file;
       if (file) {
-        this.image = URL.createObjectURL(file);
-
-        console.log("Image: ", this.image);
+        this.imageUrl = URL.createObjectURL(file);
       } else {
-        this.image = null;
+        this.imageUrl = null;
       }
     },
 
     // Save News
     SaveNews() {
+
+      let formData = new FormData()
+        formData.append('file', this.image)
+        this.image = formData;
+
       let news = {
         id: this.newsID,
         userId: 5,
@@ -409,23 +437,36 @@ export default {
         content: this.content,
         short_description: this.short_description,
         image: this.image,
-        created_by: "Chanthy tha",
-        updated_by: "Chanthy tha",
         updated_at: new Date()
 
       };
 
       console.log(news);
 
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
       if (this.newsID > 0) {
-        axios.put(process.env.VUE_APP_API_URL + "/news", news, { validateStatus: () => true, }).then((res) => {
+        axios.put(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
           this.message = res.data.message;
           this.AddUpdateData(res.data.id);
         });
       } else {
-        axios.post(process.env.VUE_APP_API_URL + "/news", news, { validateStatus: () => true, }).then((res) => {
+        axios.post(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
           this.message = res.data.message;
           this.AddUpdateData(res.data.id);
+
+          setInterval(() => {
+            this.categorySelected = null;
+            this.authorSelected = null;
+            this.tagSelected = null;
+            this.title = null;
+            this.content = null;
+            this.short_description = null;
+            this.image = null;
+          }, 4000);
         });
       }
     },
@@ -443,8 +484,13 @@ export default {
 
     // delete news by ID
     ConfirmDeleteItem() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
       axios
-        .delete(process.env.VUE_APP_API_URL + "/news/" + this.newsID, {
+        .delete(process.env.VUE_APP_API_URL + "/news/" + this.newsID, { headers }, {
           validateStatus: () => true,
         })
         .then((res) => {
