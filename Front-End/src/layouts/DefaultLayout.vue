@@ -2,7 +2,9 @@
   <v-app>
     <AppSidebar />
     <v-main>
-      <router-view />
+      <div class="custom-main">
+        <router-view />
+      </div>
     </v-main>
   </v-app>
 </template>
@@ -17,4 +19,6 @@ export default {
   },
 };
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+@import "@/sass/layouts/_default-layout.scss";
+</style>
