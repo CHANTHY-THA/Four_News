@@ -115,6 +115,7 @@
         :items="authorList"
         :items-length="totalItems"
         :loading="loading"
+        :search="search"
         item-value="username"
         @update:options="loadItems"
         class="custom-table"
@@ -122,6 +123,19 @@
         <template v-slot:top>
           <v-toolbar flat color="white" class="custom-toolbar">
             <v-toolbar-title>Author List</v-toolbar-title>
+            <v-spacer></v-spacer>
+
+            <v-text-field
+              v-model="search"
+              density="compact"
+              label="Search"
+              prepend-inner-icon="mdi-magnify"
+              variant="solo-filled"
+              flat
+              hide-details
+              single-line
+              class="me-3 btn-search custom-text-field"
+            ></v-text-field>
           </v-toolbar>
         </template>
         <template v-slot:item="{ item }">
@@ -229,6 +243,8 @@ export default {
     backgroundColor: "",
     page: 1,
     itemsPerPage: process.env.VUE_APP_ITEM_PER_PAGE,
+
+    search: "",
   }),
   computed: {
     formTitle() {
@@ -245,7 +261,12 @@ export default {
       this.getAuthor();
     },
     getAuthor() {
-      const params = { page: this.page, itemPerPage: this.itemsPerPage };
+      console.log("search: " + this.search);
+      const params = {
+        page: this.page,
+        itemPerPage: this.itemsPerPage,
+        search: this.search,
+      };
       axios
         .get(process.env.VUE_APP_API_URL + "/authors", { params })
         .then((res) => {

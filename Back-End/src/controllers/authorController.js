@@ -6,29 +6,31 @@ const prisma = new PrismaClient();
 const getAuthors = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(process.env.PAGESIZE);
+    let limit =
+      parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
+
     let result = [];
     let recordSkip = (page - 1) * limit;
 
-    const totalRecord = await prisma.authors.findMany({
-      where: {
-        status: 1,
-      },
-    });
+    let search = req.query.search || "";
+    let whereConditions = {};
 
+    if (search) {
+      whereConditions.OR = [
+        { username: { contains: search } },
+        { biography: { contains: search } },
+      ];
+    }
+    whereConditions.status = 1;
+
+    const totalRecord = await prisma.authors.findMany({
+      where: whereConditions,
+    });
     const totalRecordPerPage = await prisma.authors.findMany({
-      where: { status: 1 },
+      where: whereConditions,
       skip: recordSkip,
       take: limit,
       orderBy: { ID: "desc" },
-    });
-
-    totalRecordPerPage.forEach((t) => {
-      const createdAtFormat = dayjs(t.created_at);
-      const updatedAtFormat = dayjs(t.updated_at);
-      t.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
-      t.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-      result.push(t);
     });
 
     totalRecordPerPage.forEach((t) => {
@@ -202,7 +204,7 @@ const updateAuthor = async (req, res) => {
     const foundAuthor = await prisma.authors.findFirst({
       where: { ID: id, status: 1 },
     });
-    console.log("data: " + foundAuthor);
+
     if (!foundAuthor) {
       return new Response(res)
         .setID(0)
