@@ -110,24 +110,6 @@
     </v-main>
   -->
 </template>
-<style>
-.logo .v-img__img--cover {
-  object-fit: fill;
-}
-.logo .v-img__img {
-  width: 100%;
-  height: 100%;
-}
-.logo .v-avatar.v-avatar--size-default {
-  --v-avatar-height: 70px;
-}
-.logo {
-  justify-content: center;
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-</style>
 <script>
 // import JsonData from "@/assets/data.json";
 // import logo from "@/assets/profiles/sdworks.png";
@@ -178,6 +160,11 @@ export default {
           title: "Category",
           icon: "mdi-file-chart-outline",
           path: "/category",
+        },
+        {
+          title: "Author",
+          icon: "mdi-file-chart-outline",
+          path: "/author",
         },
       ],
       userItems: [

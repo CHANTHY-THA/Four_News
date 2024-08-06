@@ -5,6 +5,7 @@ import LoginLayout from "../layouts/LoginLayout.vue";
 import CategoryView from "../views/CategoryView.vue";
 import UserView from "../views/User.vue";
 import HomeView from "../views/HomeView.vue";
+import AuthorView from "../views/Author.vue";
 
 import LoginView from "../views/Login.vue";
 import NewsView from "@/views/NewsView.vue";
@@ -44,6 +45,11 @@ const routes = [
         path: "home",
         name: "home",
         component: HomeView,
+      },
+      {
+        path: "author",
+        name: "author",
+        component: AuthorView,
       },
     ],
   },

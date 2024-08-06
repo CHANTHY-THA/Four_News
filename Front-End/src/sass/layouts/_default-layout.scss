@@ -1,0 +1,11 @@
+// Variables
+@import "./custom-vuetify.scss";
+@import "../_variables.scss";
+
+.custom-main {
+  background-color: $body-bg;
+  height: 100%;
+}
+.custom-main-padding {
+  padding: 20px;
+}
