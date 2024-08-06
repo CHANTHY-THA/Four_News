@@ -28,7 +28,7 @@
 }
 // custom table style
 .custom-table {
-  border-radius: $bordeRadius !important;
+  border-radius: $borderRadius !important;
   overflow: hidden;
   .custom-toolbar {
     border-bottom: 1px solid rgba(128, 128, 128, 0.577);
@@ -54,4 +54,21 @@
     display: flex;
     justify-content: center !important;
   }
+}
+
+//custom button search
+.v-field--variant-solo,
+.v-field--variant-solo-filled {
+  background: none !important;
+}
+.btn-search {
+  border: 1px solid #e0e0e0;
+  border-radius: $borderRadius;
+}
+.v-field__field {
+  background-color: white;
+  border-radius: $borderRadius;
+}
+.v-field--variant-solo-filled .v-field__overlay {
+  background-color: white !important;
 }
