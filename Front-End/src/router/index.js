@@ -6,6 +6,7 @@ import CategoryView from "../views/CategoryView.vue";
 import UserView from "../views/User.vue";
 import HomeView from "../views/HomeView.vue";
 import AuthorView from "../views/Author.vue";
+import DashboardView from "../views/Dashboard.vue";
 
 import LoginView from "../views/Login.vue";
 import NewsView from "@/views/NewsView.vue";
@@ -51,6 +52,11 @@ const routes = [
         name: "author",
         component: AuthorView,
       },
+      {
+        path: "dashboard",
+        name: "dashboard",
+        component: DashboardView,
+      },
     ],
   },
 ];
@@ -66,7 +72,7 @@ router.beforeEach((to) => {
   if (to.fullPath != "/" && !token) {
     return "/"
   } else if (to.fullPath == "/" && token) {
-    return "/category"
+    return "/dashboard"
   }
 })
 

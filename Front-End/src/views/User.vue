@@ -1,16 +1,22 @@
 <template>
-  <div>
-    <div style="padding: 20px; background: #e0e0e0; height: 100%">
-      <div style="margin-bottom: 30px">
+  <div class="custom-main-padding">
+    <div>
+      <div>
         <!-- add and edit form -->
         <v-dialog
           v-model="dialog"
           persistent
           transition="dialog-center-transition"
           max-width="500px"
+          class="custom-add-dialog"
         >
           <template v-slot:activator="{ props }">
-            <v-btn color="info" dark class="mb-2 float-right" v-bind="props">
+            <v-btn
+              color="info"
+              dark
+              class="mb-2 float-right i-btn-add"
+              v-bind="props"
+            >
               Add User
               <!-- <ToolTipMessage message="Add New User"></ToolTipMessage> -->
             </v-btn>
@@ -114,19 +120,26 @@
         :items-length="totalItems"
         :loading="loading"
         item-value="username"
+        :search="search"
         @update:options="loadItems"
+        class="custom-table"
       >
         <template v-slot:top>
-          <v-toolbar
-            flat
-            color="white"
-            style="
-              border-bottom: 1px solid rgba(128, 128, 128, 0.577);
-              display: flex;
-              justify-content: space-between;
-            "
-          >
+          <v-toolbar flat color="white" class="custom-toolbar">
             <v-toolbar-title>User List</v-toolbar-title>
+            <v-spacer></v-spacer>
+
+            <v-text-field
+              v-model="search"
+              density="compact"
+              label="Search"
+              prepend-inner-icon="mdi-magnify"
+              variant="solo-filled"
+              flat
+              hide-details
+              single-line
+              class="me-3 btn-search custom-text-field"
+            ></v-text-field>
           </v-toolbar>
         </template>
         <template v-slot:item="{ item }">
@@ -138,33 +151,13 @@
             <td>{{ item.created_at }}</td>
             <td>
               <div class="d-flex">
-                <div
-                  @click="EditUser(item)"
-                  style="
-                    margin-right: 5px;
-                    background: green;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
-                >
+                <div @click="EditUser(item)" class="custom-edit">
                   <v-icon size="17" color="white"> mdi-pencil</v-icon>
                   <ToolTipMessage message="Edit User"></ToolTipMessage>
                 </div>
                 <div
                   @click="DeleteUser(item.ID, item.username)"
-                  style="
-                    background: red;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
+                  class="custom-delete"
                 >
                   <v-icon size="17" color="white"> mdi-delete</v-icon>
                 </div>
@@ -256,6 +249,7 @@ export default {
     page: 1,
     itemsPerPage: process.env.VUE_APP_ITEM_PER_PAGE,
     roleList: [],
+    search: "",
   }),
   computed: {
     formTitle() {
@@ -269,8 +263,38 @@ export default {
     loadItems({ page, itemsPerPage }) {
       this.page = page;
       this.itemsPerPage = itemsPerPage;
-      this.getUser();
+      this.searchUser();
     },
+    searchUser() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const params = {
+        page: this.page,
+        itemPerPage: this.itemsPerPage,
+        username: this.search,
+      };
+      axios
+        .get(
+          process.env.VUE_APP_API_URL + "/users/filter",
+          { headers, params },
+          { validateStatus: () => true }
+        )
+        .then((res) => {
+          this.userList = res.data.data.users;
+          console.log(
+            "🚀 ~ file: User.vue:279 ~ .then ~ userList:",
+            this.userList
+          );
+          this.totalItems = res.data.data.pagination.total_record;
+          this.loading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     getUser() {
       let token = localStorage.getItem("authToken");
       let headers = {

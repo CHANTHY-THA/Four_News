@@ -8,7 +8,8 @@ const salt = 10;
 const getUsers = async (req, res) => {
     try {
         let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(process.env.PAGESIZE);
+        // let limit = parseInt(process.env.PAGESIZE);
+        let limit = parseInt(req.query.itemPerPage);
         let result = [];
         let recordSkip = (page - 1) * limit;
 
@@ -106,7 +107,9 @@ const getUserByFilter = async (req, res) => {
 
         // pagination
         let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(process.env.PAGESIZE);
+        // let limit = parseInt(process.env.PAGESIZE);
+        let limit = parseInt(req.query.itemPerPage);
+        // console.log("🚀 ~ file: userController.js:111 ~ getUserByFilter ~ req.query.itemsPerPage:", req.query.itemPerPage)
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
 
@@ -119,13 +122,13 @@ const getUserByFilter = async (req, res) => {
             },
         });
 
-        if (userList.length == 0) {
-            return new Response(res)
-                .setID(0)
-                .setStatusCode(404)
-                .setMessage("No data found.")
-                .send();
-        }
+        // if (userList.length == 0) {
+        //     return new Response(res)
+        //         .setID(0)
+        //         .setStatusCode(404)
+        //         .setMessage("No data found.")
+        //         .send();
+        // }
         const users = userList.slice(startIndex, endIndex);
 
         users.forEach((user) => {
