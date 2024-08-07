@@ -10,6 +10,7 @@ import DashboardView from "../views/Dashboard.vue";
 
 import LoginView from "../views/Login.vue";
 import NewsView from "@/views/NewsView.vue";
+import TagView from "../views/TagView.vue";
 
 const routes = [
   {
@@ -56,6 +57,11 @@ const routes = [
         path: "dashboard",
         name: "dashboard",
         component: DashboardView,
+      },
+      {
+        path: "/tag",
+        name: "tag",
+        component: TagView,
       },
     ],
   },

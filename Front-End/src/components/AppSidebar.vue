@@ -162,6 +162,11 @@ export default {
           path: "/category",
         },
         {
+          title: "Tag",
+          icon: "mdi-tag-multiple",
+          path: "/tag",
+        },
+        {
           title: "Author",
           icon: "mdi-account-tie",
           path: "/author",
