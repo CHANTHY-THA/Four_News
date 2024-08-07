@@ -30,12 +30,13 @@ const getNews = async (req, res) => {
       orderBy: { updated_at: "desc" },
     });
 
-    newsList.forEach((cat) => {
-      const createdAtFormat = dayjs(cat.created_at);
-      const updatedAtFormat = dayjs(cat.updated_at);
-      cat.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
-      cat.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-      result.push(cat);
+    newsList.forEach((news) => {
+      const createdAtFormat = dayjs(news.created_at);
+      const updatedAtFormat = dayjs(news.updated_at);
+      news.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
+      news.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+      news.image = `http://localhost:8888/api/images/${getImage(news.image)}`
+      result.push(news);
     });
 
     const total_page = Math.ceil(totalRecord.length / limit);
@@ -59,6 +60,14 @@ const getNews = async (req, res) => {
       .send();
   }
 };
+
+function getImage(image) {
+  if (image === null) {
+    return "default-profile.jpg";
+  } else {
+    return image;
+  }
+}
 
 const getNewsByID = async (req, res) => {
 
@@ -208,13 +217,13 @@ const addNews = async (req, res) => {
       filename: (req, file, cb) => {
         let filename = uuidv4().slice(-12);
         filename = `${filename}_${file.originalname}`
+        // `${file.fieldname}_dateVal_${Date.now()}_${file.originalname}`)
         cb(null, filename)
       },
     })
-
+    
     const upload = multer({ storage: storage })
-
-    console.log("Image: ", upload);
+    console.log("Image: ", upload.single('file'));
 
     if (!foundNews) {
       const news = await prisma.News.create({
@@ -223,7 +232,7 @@ const addNews = async (req, res) => {
           authorId: authorId,
           userId: userId,
           title: title,
-          image: image,
+          image: upload.single('file'),
           short_description: short_description,
           content: content,
           created_by: req.user.username,
@@ -287,7 +296,7 @@ const updateNews = async (req, res) => {
     const foundNews = await prisma.News.findFirst({
       where: { ID: id, status: 1 },
     });
-    console.log("data: " , foundNews);
+    console.log("data: ", foundNews);
     if (!foundNews) {
       return new Response(res)
         .setID(0)

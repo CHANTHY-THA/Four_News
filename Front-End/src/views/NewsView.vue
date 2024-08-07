@@ -82,8 +82,9 @@
                       </v-row>
                       <v-row>
                         <v-col cols="6">
-                          <v-file-input v-model="image" @change="onFileChange" label="Image" counter show-size
-                            small-chips color="primary" truncate-length="50" variant="outlined"></v-file-input>
+                          <input type="file" ref="file" @change="onFileChange" />
+                          <!-- <v-file-input v-model="image" @change="onFileChange" label="Image" counter show-size
+                            small-chips color="primary" truncate-length="50" variant="outlined"></v-file-input> -->
                         </v-col>
                         <v-col cols="6" v-if="image">
                           <v-img :src="image" max-height="150px" max-width="150px"></v-img>
@@ -288,6 +289,9 @@ export default {
           this.newsList = res.data.data.news;
           this.totalItems = res.data.data.pagination.total_record;
           this.loading = false;
+
+          console.log(this.newsList);
+          
         });
     },
 
@@ -410,9 +414,10 @@ export default {
     },
 
     // select image
-    onFileChange(event) {
-      let file = event.target.files[0];
+    onFileChange() {
+      const file = this.$refs.file.files[0];
       this.image = file;
+
       if (file) {
         this.imageUrl = URL.createObjectURL(file);
       } else {
@@ -422,10 +427,8 @@ export default {
 
     // Save News
     SaveNews() {
-
-      let formData = new FormData()
-        formData.append('file', this.image)
-        this.image = formData;
+      const formData = new FormData();
+      formData.append('file', this.image);
 
       let news = {
         id: this.newsID,
@@ -436,7 +439,7 @@ export default {
         title: this.title,
         content: this.content,
         short_description: this.short_description,
-        image: this.image,
+        image: formData,
         updated_at: new Date()
 
       };
@@ -449,25 +452,37 @@ export default {
       };
 
       if (this.newsID > 0) {
-        axios.put(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
-          this.message = res.data.message;
-          this.AddUpdateData(res.data.id);
-        });
-      } else {
-        axios.post(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
-          this.message = res.data.message;
-          this.AddUpdateData(res.data.id);
+        try {
+          axios.put(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
+            this.message = res.data.message;
+            this.AddUpdateData(res.data.id);
+          });
+        } catch (err) {
+          console.log(err);
+          this.message = err.response.data.error;
+        }
 
-          setInterval(() => {
-            this.categorySelected = null;
-            this.authorSelected = null;
-            this.tagSelected = null;
-            this.title = null;
-            this.content = null;
-            this.short_description = null;
-            this.image = null;
-          }, 4000);
-        });
+      } else {
+        try {
+          axios.post(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
+            this.message = res.data.message;
+            this.AddUpdateData(res.data.id);
+
+            setInterval(() => {
+              this.categorySelected = null;
+              this.authorSelected = null;
+              this.tagSelected = null;
+              this.title = null;
+              this.content = null;
+              this.short_description = null;
+              this.image = null;
+            }, 4000);
+          });
+
+        } catch (err) {
+          console.log(err);
+          this.message = err.response.data.error;
+        }
       }
     },
 
