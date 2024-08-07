@@ -358,7 +358,7 @@ const updateUser = async (req, res) => {
 const updatePassword = async (req, res) => {
     try {
         const body = req.body;
-        let id = parseInt(req.params.id);
+        let id = parseInt(req.user.ID);
         const { newPassword, confirmPassword, currentPassword } = body;
         if (isNaN(id)) {
             return new Response(res)

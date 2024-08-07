@@ -14,7 +14,7 @@ userRoutes.patch("/username/:id", authMiddleware, UserController.updateUsername)
 
 userRoutes.patch("/user/:id", authMiddleware, UserController.updateUser);
 
-userRoutes.patch("/password/:id", authMiddleware, UserController.updatePassword);
+userRoutes.patch("/password", authMiddleware, UserController.updatePassword);
 
 userRoutes.delete("/user/:id", authMiddleware, UserController.deleteUser);
 

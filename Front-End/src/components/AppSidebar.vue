@@ -63,6 +63,30 @@
             ></v-list-item-title>
           </v-list-item>
         </v-list-group>
+        <v-list-group>
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" prepend-icon="mdi-cog">
+              <v-list-item-title style="font-size: 15px"
+                >Setting</v-list-item-title
+              >
+            </v-list-item>
+          </template>
+          <v-list-item
+            v-for="(item, i) in settingItems"
+            :key="i"
+            :value="item"
+            color="grey-lighten-4"
+            :to="item.path"
+          >
+            <template v-slot:prepend>
+              <v-icon :icon="item.icon"></v-icon>
+            </template>
+            <v-list-item-title
+              v-text="item.title"
+              style="font-size: 15px"
+            ></v-list-item-title>
+          </v-list-item>
+        </v-list-group>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar>
@@ -162,9 +186,21 @@ export default {
           path: "/category",
         },
         {
+          title: "Tag",
+          icon: "mdi-tag-multiple",
+          path: "/tag",
+        },
+        {
           title: "Author",
           icon: "mdi-account-tie",
           path: "/author",
+        },
+      ],
+      settingItems: [
+        {
+          title: "Change Password",
+          icon: "mdi-shield-key",
+          path: "/change-password",
         },
       ],
       userItems: [
