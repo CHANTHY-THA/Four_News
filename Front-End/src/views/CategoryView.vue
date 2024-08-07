@@ -349,8 +349,9 @@ export default {
       let headers = {
         Authorization: `Bearer ${token}`,
       };
+      const params = { page: 0, itemPerPage: 100 };
       axios
-        .get(process.env.VUE_APP_API_URL + "/users", { headers })
+        .get(process.env.VUE_APP_API_URL + "/users", { headers, params })
         .then((res) => {
           let users = res.data.data.users;
           users.forEach((user) => {

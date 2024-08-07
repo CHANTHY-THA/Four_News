@@ -8,6 +8,8 @@ const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const newsTagRoutes = require("./routes/newstagRoutes");
 const imageRoutes = require("./routes/imageRoutes");
+
+const settingRoutes = require("./routes/settingRoutes");
 var cors = require('cors');
 
 
@@ -30,6 +32,8 @@ router.use("/api", userRoutes);
 router.use("/api", authRoutes);
 router.use("/api", imageRoutes);
 
+
+router.use("/api", settingRoutes);
 
 
 

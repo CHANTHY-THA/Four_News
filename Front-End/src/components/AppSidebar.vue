@@ -43,7 +43,7 @@
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props" prepend-icon="mdi-application-cog">
               <v-list-item-title style="font-size: 15px"
-                >Leave Management</v-list-item-title
+                >Features</v-list-item-title
               >
             </v-list-item>
           </template>
@@ -127,43 +127,43 @@ export default {
       items: [
         { title: "Dashboard", icon: "mdi-view-dashboard", path: "/dashboard" },
         // { title: 'My Profile', icon: 'mdi-account',path:"/myprofile" },
-        { title: "Department", icon: "mdi-domain", path: "/department" },
+        // { title: "Department", icon: "mdi-domain", path: "/department" },
         {
-          title: "Employee",
+          title: "Users",
           icon: "mdi-account-group-outline",
-          path: "/employee",
-        },
-        { title: "My Leave", icon: "mdi-application", path: "/myleave" },
-      ],
-      leaveItems: [
-        {
-          title: "Padding Leave",
-          icon: "mdi-book-clock",
-          path: "/pending-leave",
-        },
-        {
-          title: "Leave Report",
-          icon: "mdi-file-chart-outline",
-          path: "/leave-report",
-        },
-        {
-          title: "News",
-          icon: "mdi-file-chart-outline",
-          path: "/news",
-        },
-        {
-          title: "User",
-          icon: "mdi-file-chart-outline",
           path: "/user",
         },
+        // { title: "My Leave", icon: "mdi-application", path: "/myleave" },
+      ],
+      leaveItems: [
+        // {
+        //   title: "Padding Leave",
+        //   icon: "mdi-book-clock",
+        //   path: "/pending-leave",
+        // },
+        // {
+        //   title: "Leave Report",
+        //   icon: "mdi-file-chart-outline",
+        //   path: "/leave-report",
+        // },
+        {
+          title: "News",
+          icon: "mdi-newspaper-variant-outline",
+          path: "/news",
+        },
+        // {
+        //   title: "User",
+        //   icon: "mdi-file-chart-outline",
+        //   path: "/user",
+        // },
         {
           title: "Category",
-          icon: "mdi-file-chart-outline",
+          icon: "mdi-shape-plus",
           path: "/category",
         },
         {
           title: "Author",
-          icon: "mdi-file-chart-outline",
+          icon: "mdi-account-tie",
           path: "/author",
         },
       ],

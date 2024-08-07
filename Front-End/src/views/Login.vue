@@ -122,7 +122,7 @@ export default {
           this.backgroundColor = "red";
           if (res.data.statusCode == 200) {
             localStorage.setItem("authToken", res.data.result.token);
-            this.$router.push(`/category`);
+            this.$router.push(`/dashboard`);
             this.username = "";
             this.password = "";
             this.backgroundColor = "green";

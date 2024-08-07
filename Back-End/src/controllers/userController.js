@@ -8,7 +8,8 @@ const salt = 10;
 const getUsers = async (req, res) => {
     try {
         let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(process.env.PAGESIZE);
+        // let limit = parseInt(process.env.PAGESIZE);
+        let limit = parseInt(req.query.itemPerPage);
         let result = [];
         let recordSkip = (page - 1) * limit;
 
@@ -106,7 +107,9 @@ const getUserByFilter = async (req, res) => {
 
         // pagination
         let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(process.env.PAGESIZE);
+        // let limit = parseInt(process.env.PAGESIZE);
+        let limit = parseInt(req.query.itemPerPage);
+        // console.log("🚀 ~ file: userController.js:111 ~ getUserByFilter ~ req.query.itemsPerPage:", req.query.itemPerPage)
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
 
@@ -119,13 +122,13 @@ const getUserByFilter = async (req, res) => {
             },
         });
 
-        if (userList.length == 0) {
-            return new Response(res)
-                .setID(0)
-                .setStatusCode(404)
-                .setMessage("No data found.")
-                .send();
-        }
+        // if (userList.length == 0) {
+        //     return new Response(res)
+        //         .setID(0)
+        //         .setStatusCode(404)
+        //         .setMessage("No data found.")
+        //         .send();
+        // }
         const users = userList.slice(startIndex, endIndex);
 
         users.forEach((user) => {
@@ -286,6 +289,72 @@ const updateUsername = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const body = req.body;
+        let id = parseInt(req.params.id);
+        const { username, role } = body;
+
+        if (isNaN(id)) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(400)
+                .setMessage("ID must be a number.")
+                .send();
+        }
+
+        if (!username) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(400)
+                .setMessage("Username is required.")
+                .send();
+        }
+
+        const foundUser = await prisma.users.findFirst({
+            where: { ID: id, status: 1 },
+        });
+        if (!foundUser) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(404)
+                .setMessage("No data found.")
+                .send();
+        }
+
+        const checkRecordExist = await prisma.users.findFirst({
+            where: { username: username },
+        });
+
+        if (checkRecordExist && checkRecordExist?.ID != id) {
+            return new Response(res)
+                .setID(0)
+                .setStatusCode(400)
+                .setMessage("Username already exist.")
+                .send();
+        } else {
+            await prisma.users.update({
+                where: { ID: id },
+                data: {
+                    username: username,
+                    role: role
+                },
+            });
+            return new Response(res)
+                .setID(1)
+                .setMessage("User updated successfully.")
+                .send();
+        }
+    } catch (err) {
+        console.log("Error updateUser:" + err.message);
+        return new Response(res)
+            .setID(0)
+            .setStatusCode(500)
+            .setMessage("Something went wrong.")
+            .send();
+    }
+};
+
 const updatePassword = async (req, res) => {
     try {
         const body = req.body;
@@ -421,4 +490,5 @@ module.exports = {
     getUserByID,
     deleteUser,
     getUserByFilter,
+    updateUser
 };
