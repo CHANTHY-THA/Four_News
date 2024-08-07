@@ -34,10 +34,10 @@
           <div>
             <v-dialog v-model="dialog" persistent transition="dialog-center-transition" max-width="800px">
               <template v-slot:activator="{ props }">
-                <!-- <v-btn color="info" dark v-bind="props" style="margin-left: 20px">
+                <v-btn color="info" dark v-bind="props" style="margin-left: 20px">
                   Create
-                </v-btn> -->
-                <v-btn icon="mdi-dots-vertical" v-bind="props"></v-btn>
+                </v-btn>
+                <!-- <v-btn icon="mdi-dots-vertical" v-bind="props"></v-btn> -->
               </template>
               <v-card>
                 <v-card-title style="padding: 15px" primary-title>
@@ -82,12 +82,12 @@
                       </v-row>
                       <v-row>
                         <v-col cols="6">
-                          <input type="file" ref="file" @change="onFileChange" />
+                          <input type="file" @change="onFileChange" accept="image/*" />
                           <!-- <v-file-input v-model="image" @change="onFileChange" label="Image" counter show-size
                             small-chips color="primary" truncate-length="50" variant="outlined"></v-file-input> -->
                         </v-col>
                         <v-col cols="6" v-if="image">
-                          <v-img :src="image" max-height="150px" max-width="150px"></v-img>
+                          <v-img :src="image" max-height="160px" max-width="160px"></v-img>
                         </v-col>
                       </v-row>
                     </v-form>
@@ -115,12 +115,13 @@
           :items-length="totalItems" :loading="loading" item-value="name" @update:options="loadItems">
           <template v-slot:item="{ item }">
             <tr>
-              <td style="width: 17%;">
-                <img :src="news_url + item.image" max-height="150px" max-width="170px" alt="" />
+              <td style="width: 20%;">
+                <!-- <img :src="news_url + item.image" max-height="150px" max-width="170px" alt="" /> -->
+                <v-img :src="image" max-height="200px" max-width="200px"></v-img>
               </td>
               <td style="width: 20%;">
                 <h3>{{ item.title }}</h3>
-                <p style="margin-top: 10px;">{{ item.content }}</p>
+                <!-- <p style="margin-top: 10px;">{{ item.content }}</p> -->
                 <p style="margin-top: 5px;color: gray;">Author by: {{ item.author ? item.author.username : "" }}</p>
               </td>
               <!-- <td style="width: 20%;">{{ item.content }}</td> -->
@@ -229,9 +230,9 @@ export default {
     content: "",
     short_description: "",
     image: null,
-    imageUrl: null,
+    // imageUrl: null,
     selectedFile: null,
-    news_url: "http://127.0.0.1:8888/images/",
+    news_url: process.env.VUE_APP_API_URL + "/images/",
 
     NewsForm: false,
     dialog: false,
@@ -282,16 +283,21 @@ export default {
 
     // Get News List
     getNewsList() {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       const params = { page: this.page, itemPerPage: this.itemsPerPage };
+
       axios
-        .get(process.env.VUE_APP_API_URL + "/news", { params })
+        .get(process.env.VUE_APP_API_URL + "/news", { params,headers })
         .then((res) => {
           this.newsList = res.data.data.news;
           this.totalItems = res.data.data.pagination.total_record;
           this.loading = false;
 
           console.log(this.newsList);
-          
+
         });
     },
 
@@ -334,20 +340,20 @@ export default {
     },
 
     // get User List
-    getUser() {
-      let token = localStorage.getItem("authToken");
-      let headers = {
-        Authorization: `Bearer ${token}`,
-      };
+    // getUser() {
+    //   let token = localStorage.getItem("authToken");
+    //   let headers = {
+    //     Authorization: `Bearer ${token}`,
+    //   };
 
-      axios.get(process.env.VUE_APP_API_URL + "/users", { headers }).then((res) => {
-        let users = res.data.data.users;
-        users.forEach((user) => {
-          this.userList.push(user);
-        });
-        // this.userSelected = this.userList[0];
-      });
-    },
+    //   axios.get(process.env.VUE_APP_API_URL + "/users", { headers }).then((res) => {
+    //     let users = res.data.data.users;
+    //     users.forEach((user) => {
+    //       this.userList.push(user);
+    //     });
+    //     // this.userSelected = this.userList[0];
+    //   });
+    // },
 
     // get Author List
     getAuthorList() {
@@ -414,22 +420,27 @@ export default {
     },
 
     // select image
-    onFileChange() {
-      const file = this.$refs.file.files[0];
-      this.image = file;
+    onFileChange(e) {
+      const selectedImage = e.target.files[0];
+      this.createBase64Image(selectedImage);
 
-      if (file) {
-        this.imageUrl = URL.createObjectURL(file);
-      } else {
-        this.imageUrl = null;
-      }
+      // if (file) {
+      //   this.imageUrl = URL.createObjectURL(file);
+      // } else {
+      //   this.imageUrl = null;
+      // }
+    },
+
+    createBase64Image(fileObject) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.image = e.target.result;
+      };
+      reader.readAsDataURL(fileObject);
     },
 
     // Save News
     SaveNews() {
-      const formData = new FormData();
-      formData.append('file', this.image);
-
       let news = {
         id: this.newsID,
         userId: 5,
@@ -439,9 +450,8 @@ export default {
         title: this.title,
         content: this.content,
         short_description: this.short_description,
-        image: formData,
+        image: null,
         updated_at: new Date()
-
       };
 
       console.log(news);
@@ -453,7 +463,7 @@ export default {
 
       if (this.newsID > 0) {
         try {
-          axios.put(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
+          axios.put(process.env.VUE_APP_API_URL + "/news", news,  { headers }, { validateStatus: () => true, }).then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
           });
@@ -464,7 +474,7 @@ export default {
 
       } else {
         try {
-          axios.post(process.env.VUE_APP_API_URL + "/news", news, { headers: headers }, { validateStatus: () => true, }).then((res) => {
+          axios.post(process.env.VUE_APP_API_URL + "/news", news, { headers }, { validateStatus: () => true, }).then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
 
@@ -536,7 +546,7 @@ export default {
 
   // Mounted Method
   mounted() {
-    this.getUser();
+    // this.getUser();
     this.getCategoryList();
     this.getAuthorList();
     this.getTagList();

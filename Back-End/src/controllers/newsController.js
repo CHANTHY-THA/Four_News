@@ -128,7 +128,7 @@ const getNewsByFilter = async (req, res) => {
       }
     })
 
-    console.log("category ", category);
+    // console.log("category ", category);
 
     const newsList = await prisma.News.findMany({
       include: {
@@ -205,25 +205,12 @@ const addNews = async (req, res) => {
         .setMessage("News title is required.")
         .send();
     }
+
+    console.log(body);
+
     const foundNews = await prisma.News.findFirst({
       where: { title: title },
     });
-
-    const storage = multer.diskStorage({
-      destination: (req, file, cb) => {
-        console.log("🚀 ~ file:", file)
-        cb(null, 'images/')
-      },
-      filename: (req, file, cb) => {
-        let filename = uuidv4().slice(-12);
-        filename = `${filename}_${file.originalname}`
-        // `${file.fieldname}_dateVal_${Date.now()}_${file.originalname}`)
-        cb(null, filename)
-      },
-    })
-    
-    const upload = multer({ storage: storage })
-    console.log("Image: ", upload.single('file'));
 
     if (!foundNews) {
       const news = await prisma.News.create({
@@ -232,7 +219,7 @@ const addNews = async (req, res) => {
           authorId: authorId,
           userId: userId,
           title: title,
-          image: upload.single('file'),
+          image: image,
           short_description: short_description,
           content: content,
           created_by: req.user.username,
@@ -254,6 +241,7 @@ const addNews = async (req, res) => {
         .setMessage("News created successfully.")
         .send();
     }
+
     return new Response(res)
       .setID(0)
       .setStatusCode(400)
@@ -309,21 +297,21 @@ const updateNews = async (req, res) => {
       where: { title: title },
     });
 
-    const storage = multer.diskStorage({
-      destination: (req, file, cb) => {
-        console.log("🚀 ~ file:", file)
-        cb(null, 'images/')
-      },
-      filename: (req, file, cb) => {
-        let filename = uuidv4().slice(-12);
-        filename = `${filename}_${file.originalname}`
-        cb(null, filename)
-      },
-    })
+    // const storage = multer.diskStorage({
+    //   destination: (req, file, cb) => {
+    //     console.log("🚀 ~ file:", file)
+    //     cb(null, 'images/')
+    //   },
+    //   filename: (req, file, cb) => {
+    //     let filename = uuidv4().slice(-12);
+    //     filename = `${filename}_${file.originalname}`
+    //     cb(null, filename)
+    //   },
+    // })
 
-    const upload = multer({ storage: storage })
+    // const upload = multer({ storage: storage })
 
-    console.log("Upload: ", upload.single('file'));
+    // console.log("Upload: ", upload.single('file'));
 
     if (checkRecordExist && checkRecordExist?.ID != id) {
       return new Response(res)
@@ -339,10 +327,10 @@ const updateNews = async (req, res) => {
           authorId,
           userId,
           title,
-          image: upload.single('file'),
+          image: image,
           short_description,
           content,
-          updated_by
+          updated_by: req.user.username
         },
       });
       return new Response(res)
