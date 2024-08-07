@@ -11,6 +11,8 @@ import DashboardView from "../views/Dashboard.vue";
 import LoginView from "../views/Login.vue";
 import NewsView from "@/views/NewsView.vue";
 import TagView from "../views/TagView.vue";
+import ChangePassword from "../views/ChangePassword.vue";
+
 
 const routes = [
   {
@@ -62,6 +64,11 @@ const routes = [
         path: "/tag",
         name: "tag",
         component: TagView,
+      },
+      {
+        path: "/change-password",
+        name: "Change Password",
+        component: ChangePassword,
       },
     ],
   },
