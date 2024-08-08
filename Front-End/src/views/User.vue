@@ -283,10 +283,6 @@ export default {
         )
         .then((res) => {
           this.userList = res.data.data.users;
-          console.log(
-            "🚀 ~ file: User.vue:279 ~ .then ~ userList:",
-            this.userList
-          );
           this.totalItems = res.data.data.pagination.total_record;
           this.loading = false;
         })
@@ -303,10 +299,6 @@ export default {
       const params = { page: this.page, itemPerPage: this.itemsPerPage };
       axios.get(process.env.VUE_APP_API_URL + "/setting").then((res) => {
         this.roleList = res.data.data.role;
-        console.log(
-          "🚀 ~ file: User.vue:123~ .then ~ setting:",
-          res.data.data.role
-        );
       });
       axios
         .get(
@@ -317,10 +309,6 @@ export default {
         )
         .then((res) => {
           this.userList = res.data.data.users;
-          console.log(
-            "🚀 ~ file: User.vue:279 ~ .then ~ userList:",
-            this.userList
-          );
           this.totalItems = res.data.data.pagination.total_record;
           this.loading = false;
         });
@@ -432,7 +420,7 @@ export default {
     },
   },
   mounted() {
-    //this.getUser();
+    this.getUser();
   },
 };
 </script>
