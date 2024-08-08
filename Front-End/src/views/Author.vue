@@ -3,7 +3,7 @@
     <!-- block rearch -->
     <div>
       <v-row>
-        <v-col cols="4">
+        <v-col cols="6">
           <v-select
             v-model="filter.created_by"
             :items="userList"
@@ -16,7 +16,7 @@
             variant="underlined"
           ></v-select>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="6">
           <v-select
             v-model="filter.username"
             :items="authorfilterList"
