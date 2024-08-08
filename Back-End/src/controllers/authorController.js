@@ -98,39 +98,70 @@ const getAuthorByID = async (req, res) => {
 const getAuthorByFilter = async (req, res) => {
   try {
     const result = [];
-    const username = req.query.username;
     const created_by = req.query.created_by;
-    let whereConditions = {};
+    const username = req.query.username;
 
-    if (username) {
-      whereConditions.username = { contains: username };
+    // pagination
+    let page = parseInt(req.query.page) || 1;
+    let limit =
+      parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
+    let startIndex = (page - 1) * limit;
+    let endIndex = page * limit;
+
+    let search = req.query.search || "";
+    let whereConditions = { status: 1 };
+
+    if (search) {
+      whereConditions.OR = [
+        { username: { contains: search } },
+        { biography: { contains: search } },
+      ];
     }
 
     if (created_by) {
-      whereConditions.created_by = created_by;
+      whereConditions.created_by = { contains: created_by.toLowerCase() };
     }
-    whereConditions.status = 1;
 
-    const authorList = await prisma.authors.findMany({
+    if (username) {
+      whereConditions.username = { contains: username.toLowerCase() };
+    }
+    const authorLists = await prisma.authors.findMany({
       where: whereConditions,
     });
 
-    if (authorList.length === 0) {
+    if (limit == -1) {
+      startIndex = 0;
+      limit = authorLists.length;
+      endIndex = limit;
+    }
+
+    if (authorLists.length === 0) {
       return new Response(res)
         .setID(0)
         .setStatusCode(404)
         .setMessage("No data found.")
         .send();
     }
-
-    authorList.forEach((t) => {
+    const authors = authorLists.slice(startIndex, endIndex);
+    authors.forEach((t) => {
       const createdAtFormat = dayjs(t.created_at);
       const updatedAtFormat = dayjs(t.updated_at);
       t.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
       t.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
       result.push(t);
     });
-    return new Response(res).setResponse(authorList).send();
+    const total_page = Math.ceil(authorLists.length / limit);
+    const pagination = {
+      total_record: authorLists.length,
+      limit: limit,
+      current_page: page,
+      total_page: total_page,
+      has_next: page < total_page,
+    };
+    return new Response(res)
+      .setResponse({ authors: result, pagination: pagination })
+      .setID(1)
+      .send();
   } catch (err) {
     console.log("Error getAuthorByFilter:" + err.message);
     return new Response(res)
@@ -287,6 +318,25 @@ const deleteAuthor = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    let result = [];
+    const totalRecordPerPage = await prisma.users.findMany({
+      where: { status: 1 },
+      orderBy: { ID: "desc" },
+    });
+    result = totalRecordPerPage;
+    return new Response(res).setResponse({ users: result }).setID(1).send();
+  } catch (err) {
+    console.log("Error getUsers:" + err.message);
+    return new Response(res)
+      .setID(0)
+      .setStatusCode(500)
+      .setMessage("Something went wrong.")
+      .send();
+  }
+};
+
 module.exports = {
   getAuthors,
   getAuthorByID,
@@ -294,4 +344,5 @@ module.exports = {
   addAuthor,
   updateAuthor,
   deleteAuthor,
+  getAllUsers,
 };

@@ -22,9 +22,14 @@
 .custom-add-dialog {
 }
 .i-btn-add {
-  margin-bottom: 20px !important;
+  margin-bottom: 0px !important;
   border-radius: 10px;
+  margin-right: 15px;
   height: calc(var(--v-btn-height) + 5px) !important;
+  background-color: $blue;
+  &.text-info {
+    color: #fff !important;
+  }
 }
 // custom table style
 .custom-table {
@@ -64,11 +69,11 @@
 .btn-search {
   border: 1px solid #e0e0e0;
   border-radius: $borderRadius;
-}
-.v-field__field {
-  background-color: white;
-  border-radius: $borderRadius;
-}
-.v-field--variant-solo-filled .v-field__overlay {
-  background-color: white !important;
+  .v-field__field {
+    background-color: white;
+    border-radius: $borderRadius;
+  }
+  .v-field--variant-solo-filled .v-field__overlay {
+    background-color: white !important;
+  }
 }
