@@ -26,9 +26,7 @@
               {{ formTitle }}
             </v-card-title>
             <hr />
-            <!-- <v-card-title>
-            <span class="text-h5">{{ formTitle }}</span>
-          </v-card-title> -->
+
             <v-card-text>
               <v-container>
                 <v-form v-model="form">
@@ -42,42 +40,17 @@
                         color="primary"
                         variant="outlined"
                       ></v-text-field>
-
-                      <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
-                    </v-col>
-                  </v-row>
-                  <v-row style="margin-top: -15px" v-if="this.user_id === 0">
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="password"
-                        :rules="[required]"
-                        density="compact"
-                        label="Password"
-                        color="primary"
-                        variant="outlined"
-                      ></v-text-field>
-
-                      <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
                     </v-col>
                   </v-row>
                   <v-row style="margin-top: -15px">
                     <v-col cols="12">
-                      <v-text-field
-                        v-model="role"
-                        :rules="[required]"
-                        density="compact"
-                        label="Role"
-                        color="primary"
+                      <v-textarea
+                        clearable
+                        label="Biography"
+                        v-model="biography"
                         variant="outlined"
-                      ></v-text-field>
-
-                      <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
+                        color="primary"
+                      ></v-textarea>
                     </v-col>
                   </v-row>
                 </v-form>
@@ -101,7 +74,7 @@
                 :disabled="!form"
                 class="bg-info"
                 style="background-color: rgb(8, 88, 145); color: white"
-                @click="SaveUser"
+                @click="saveAuthor"
               >
                 Submit
               </v-btn>
@@ -146,12 +119,12 @@
             <td>{{ item.created_at }}</td>
             <td>
               <div class="d-flex">
-                <div @click="EditUser(item)" class="custom-edit">
+                <div @click="EditAuthor(item)" class="custom-edit">
                   <v-icon size="17" color="white"> mdi-pencil</v-icon>
                   <ToolTipMessage message="Edit User"></ToolTipMessage>
                 </div>
                 <div
-                  @click="DeleteUser(item.ID, item.username)"
+                  @click="DeleteAuthor(item.ID, item.username)"
                   class="custom-delete"
                 >
                   <v-icon size="17" color="white"> mdi-delete</v-icon>
@@ -228,8 +201,12 @@ export default {
       { title: "Action", sortable: false },
     ],
     username: "",
+    biography: "",
+    author_id: 0,
+
     password: "",
     role: "",
+
     form: false,
     dialog: false,
     snackbar: false,
@@ -237,7 +214,6 @@ export default {
     authorList: [],
     loading: true,
     totalItems: 0,
-    user_id: 0,
     itemName: "",
     message: "",
     backgroundColor: "",
@@ -248,7 +224,7 @@ export default {
   }),
   computed: {
     formTitle() {
-      return this.user_id === 0 ? "Add New User" : "Update User";
+      return this.author_id === 0 ? "Add New Author" : "Update Author";
     },
   },
   methods: {
@@ -280,25 +256,30 @@ export default {
           this.loading = false;
         });
     },
-    EditUser(user) {
+    EditAuthor(author) {
+      console.log("author: ", author.ID);
       this.dialog = true;
-      this.user_id = user.ID;
-      this.username = user.username;
-      // this.password = user.password;
-      this.role = user.role;
+      this.author_id = author.ID;
+      this.username = author.username;
+      this.biography = author.biography;
     },
-    SaveUser() {
-      let user = {
-        id: this.user_id,
+    saveAuthor() {
+      let author = {
+        id: this.author_id,
         username: this.username,
-        password: this.password,
-        role: this.role,
+        biography: this.biography,
       };
-      if (this.user_id > 0) {
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      if (this.author_id > 0) {
         axios
-          .patch(
-            process.env.VUE_APP_API_URL + "/username/" + this.user_id,
-            user,
+          .put(
+            process.env.VUE_APP_API_URL + "/author",
+            author,
+            { headers },
             {
               validateStatus: () => true,
             }
@@ -309,9 +290,14 @@ export default {
           });
       } else {
         axios
-          .post(process.env.VUE_APP_API_URL + "/user", user, {
-            validateStatus: () => true,
-          })
+          .post(
+            process.env.VUE_APP_API_URL + "/author",
+            author,
+            { headers },
+            {
+              validateStatus: () => true,
+            }
+          )
           .then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
@@ -326,21 +312,27 @@ export default {
         this.backgroundColor = "red";
       }
       this.snackbar = true;
-      this.getUser();
+      this.getAuthor();
       this.CloseFormAddEdit();
     },
-    DeleteUser(id, username) {
+    DeleteAuthor(id, username) {
       this.dialogDelete = true;
-      this.user_id = id;
+      this.author_id = id;
       this.username = username;
     },
     ConfirmDeleteItem() {
-      console.log("id: " + this.user_id);
-      console.log("username: " + this.username);
+      let token = localStorage.getItem("authToken");
+      let headers = {
+        Authorization: `Bearer ${token}`,
+      };
       axios
-        .delete(process.env.VUE_APP_API_URL + "/user/" + this.user_id, {
-          validateStatus: () => true,
-        })
+        .delete(
+          process.env.VUE_APP_API_URL + "/author/" + this.author_id,
+          { headers },
+          {
+            validateStatus: () => true,
+          }
+        )
         .then((res) => {
           this.message = res.data.message;
           if (res.data.id == 1) {
@@ -349,16 +341,15 @@ export default {
             this.backgroundColor = "green";
           }
           this.snackbar = true;
-          this.getUser();
+          this.getAuthor();
           this.CloseDailogDelete();
         });
     },
     CloseFormAddEdit() {
       this.dialog = false;
-      this.user_id = 0;
+      this.author_id = 0;
       this.username = "";
-      this.password = "";
-      this.role = "";
+      this.biography = "";
     },
     CloseDailogDelete() {
       this.dialogDelete = false;
@@ -366,7 +357,7 @@ export default {
     },
   },
   mounted() {
-    //this.getUser();
+    this.getAuthor();
   },
 };
 </script>
