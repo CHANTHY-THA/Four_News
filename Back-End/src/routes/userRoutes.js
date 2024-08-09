@@ -10,7 +10,11 @@ userRoutes.get("/users/filter", authMiddleware, UserController.getUserByFilter);
 
 userRoutes.post("/user", authMiddleware, UserController.addUser);
 
-userRoutes.patch("/username/:id", authMiddleware, UserController.updateUsername);
+userRoutes.patch(
+  "/username/:id",
+  authMiddleware,
+  UserController.updateUsername
+);
 
 userRoutes.patch("/user/:id", authMiddleware, UserController.updateUser);
 

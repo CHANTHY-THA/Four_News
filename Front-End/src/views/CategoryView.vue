@@ -42,14 +42,17 @@
       >
         <!-- <v-icon @click="searchCategory" size="50" color="blue" style="cursor: pointer;"> mdi-card-search</v-icon> -->
         <v-btn @click="searchCategory" style="cursor: pointer" color="blue"
-          >Search</v-btn
+          >Filter</v-btn
         >
       </v-row>
     </div>
 
     <!-- datatable -->
     <v-card flat class="mt-2" style="width: 100%">
-      <v-card-title class="d-flex align-center pe-2" style="padding: 15px">
+      <v-card-title
+        class="d-flex align-center justify-space-between pe-2"
+        style="padding: 15px"
+      >
         Category List
         <!-- <v-spacer></v-spacer> -->
         <!-- add and edit  form -->
