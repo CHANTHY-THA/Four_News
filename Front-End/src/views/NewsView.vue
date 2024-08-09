@@ -116,8 +116,8 @@
           <template v-slot:item="{ item }">
             <tr>
               <td style="width: 20%;">
-                <img :src="item.image" max-height="150px" max-width="170px" alt="" />
-                <!--<v-img :src="image" max-height="200px" max-width="200px"></v-img>-->
+                <!-- <img :src="item.image" max-height="150px" max-width="170px" alt="" /> -->
+                <v-img :src="image" max-height="200px" max-width="200px"></v-img>
               </td>
               <td style="width: 20%;">
                 <h3>{{ item.title }}</h3>
@@ -470,15 +470,15 @@ export default {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
 
-            setInterval(() => {
-              this.categorySelected = null;
-              this.authorSelected = null;
-              this.tagSelected = null;
-              this.title = null;
-              this.content = null;
-              this.short_description = null;
-              this.image = null;
-            }, 4000);
+            // setInterval(() => {
+            //   this.categorySelected = null;
+            //   this.authorSelected = null;
+            //   this.tagSelected = null;
+            //   this.title = null;
+            //   this.content = null;
+            //   this.short_description = null;
+            //   this.image = null;
+            // }, 4000);
           });
 
         } catch (err) {
@@ -492,15 +492,15 @@ export default {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
 
-            setInterval(() => {
-              this.categorySelected = null;
-              this.authorSelected = null;
-              this.tagSelected = null;
-              this.title = null;
-              this.content = null;
-              this.short_description = null;
-              this.image = null;
-            }, 4000);
+            // setInterval(() => {
+            //   this.categorySelected = null;
+            //   this.authorSelected = null;
+            //   this.tagSelected = null;
+            //   this.title = null;
+            //   this.content = null;
+            //   this.short_description = null;
+            //   this.image = null;
+            // }, 4000);
 
           });
 
