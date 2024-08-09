@@ -1,5 +1,6 @@
 // Variables
 @import "./custom-vuetify.scss";
+@import "./sidebar.scss";
 @import "../_variables.scss";
 
 .custom-main {
@@ -8,4 +9,9 @@
 }
 .custom-main-padding {
   padding: 20px;
+}
+.background-btn-color {
+  background-color: $blue;
+  cursor: pointer;
+  color: white;
 }

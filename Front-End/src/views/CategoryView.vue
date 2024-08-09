@@ -41,7 +41,7 @@
         "
       >
         <!-- <v-icon @click="searchCategory" size="50" color="blue" style="cursor: pointer;"> mdi-card-search</v-icon> -->
-        <v-btn @click="searchCategory" style="cursor: pointer" color="blue"
+        <v-btn @click="searchCategory" class="background-btn-color"
           >Filter</v-btn
         >
       </v-row>
@@ -64,7 +64,13 @@
             max-width="500px"
           >
             <template v-slot:activator="{ props }">
-              <v-btn color="info" dark v-bind="props" style="margin-left: 20px">
+              <v-btn
+                color="info"
+                dark
+                v-bind="props"
+                style="margin-left: 20px"
+                class="background-btn-color"
+              >
                 Create
               </v-btn>
             </template>

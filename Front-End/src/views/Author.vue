@@ -39,7 +39,7 @@
           margin-left: 20px;
         "
       >
-        <v-btn @click="searchCategory" style="cursor: pointer" color="blue"
+        <v-btn @click="searchCategory" class="background-btn-color"
           >Filter</v-btn
         >
       </v-row>
@@ -100,7 +100,7 @@
                   <v-btn
                     color="info"
                     dark
-                    class="mb-2 float-right i-btn-add"
+                    class="mb-2 float-right i-btn-add background-btn-color"
                     v-bind="props"
                   >
                     Create

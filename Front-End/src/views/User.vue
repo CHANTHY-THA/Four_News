@@ -14,7 +14,7 @@
             <v-btn
               color="info"
               dark
-              class="mb-2 float-right i-btn-add"
+              class="mb-2 float-right i-btn-add background-btn-color"
               v-bind="props"
             >
               Add User

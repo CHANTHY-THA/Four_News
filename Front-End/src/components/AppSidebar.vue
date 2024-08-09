@@ -4,19 +4,14 @@
       v-model="drawer"
       :rail="rail"
       permanent
-      width="285"
-      color="grey-darken-4"
       @click="rail = false"
+      class="custom-sidebar"
     >
       <div class="logo">
         <div style="margin-left: 15px">
           <v-list-item :prepend-avatar="com_logo" nav> </v-list-item>
 
-          <v-text
-            v-if="!rail"
-            style="font-weight: bold; font-size: 18px; margin-left: -15px"
-            >Four News</v-text
-          >
+          <v-text v-if="!rail" class="logo-text">Four News</v-text>
         </div>
       </div>
       <v-divider></v-divider>
@@ -55,7 +50,7 @@
             :to="item.path"
           >
             <template v-slot:prepend>
-              <v-icon :icon="item.icon"></v-icon>
+              <v-icon :icon="item.icon" class="icon-color"></v-icon>
             </template>
             <v-list-item-title
               v-text="item.title"
