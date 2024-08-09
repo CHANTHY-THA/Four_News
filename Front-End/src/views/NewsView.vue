@@ -116,8 +116,8 @@
           <template v-slot:item="{ item }">
             <tr>
               <td style="width: 20%;">
-                <!-- <img :src="news_url + item.image" max-height="150px" max-width="170px" alt="" /> -->
-                <v-img :src="image" max-height="200px" max-width="200px"></v-img>
+                <img :src="item.image" max-height="150px" max-width="170px" alt="" />
+                <!--<v-img :src="image" max-height="200px" max-width="200px"></v-img>-->
               </td>
               <td style="width: 20%;">
                 <h3>{{ item.title }}</h3>
@@ -232,7 +232,7 @@ export default {
     image: null,
     // imageUrl: null,
     selectedFile: null,
-    news_url: process.env.VUE_APP_API_URL + "/images/",
+    // news_url: process.env.VUE_APP_API_URL + "/images/",
 
     NewsForm: false,
     dialog: false,
@@ -290,7 +290,7 @@ export default {
       const params = { page: this.page, itemPerPage: this.itemsPerPage };
 
       axios
-        .get(process.env.VUE_APP_API_URL + "/news", { params,headers })
+        .get(process.env.VUE_APP_API_URL + "/news", { params, headers })
         .then((res) => {
           this.newsList = res.data.data.news;
           this.totalItems = res.data.data.pagination.total_record;
@@ -421,26 +421,29 @@ export default {
 
     // select image
     onFileChange(e) {
-      const selectedImage = e.target.files[0];
-      this.createBase64Image(selectedImage);
+      const file = e.target.files[0];
+      // this.createBase64Image(selectedImage);
 
-      // if (file) {
-      //   this.imageUrl = URL.createObjectURL(file);
-      // } else {
-      //   this.imageUrl = null;
-      // }
+      if (file) {
+        this.image = URL.createObjectURL(file);
+      } else {
+        this.image = null;
+      }
     },
 
-    createBase64Image(fileObject) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.image = e.target.result;
-      };
-      reader.readAsDataURL(fileObject);
-    },
+    // createBase64Image(fileObject) {
+    //   const reader = new FileReader();
+    //   reader.onload = (e) => {
+    //     this.image = e.target.result;
+    //   };
+    //   reader.readAsDataURL(fileObject);
+    // },
 
     // Save News
     SaveNews() {
+      let formData = new FormData();
+      formData.append('file', this.image);
+
       let news = {
         id: this.newsID,
         userId: 5,
@@ -450,7 +453,7 @@ export default {
         title: this.title,
         content: this.content,
         short_description: this.short_description,
-        image: null,
+        image: "",
         updated_at: new Date()
       };
 
@@ -463,10 +466,21 @@ export default {
 
       if (this.newsID > 0) {
         try {
-          axios.put(process.env.VUE_APP_API_URL + "/news", news,  { headers }, { validateStatus: () => true, }).then((res) => {
+          axios.put(process.env.VUE_APP_API_URL + "/news", news, { headers }, { validateStatus: () => true, }).then((res) => {
             this.message = res.data.message;
             this.AddUpdateData(res.data.id);
+
+            setInterval(() => {
+              this.categorySelected = null;
+              this.authorSelected = null;
+              this.tagSelected = null;
+              this.title = null;
+              this.content = null;
+              this.short_description = null;
+              this.image = null;
+            }, 4000);
           });
+
         } catch (err) {
           console.log(err);
           this.message = err.response.data.error;
@@ -487,6 +501,7 @@ export default {
               this.short_description = null;
               this.image = null;
             }, 4000);
+
           });
 
         } catch (err) {

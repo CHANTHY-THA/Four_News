@@ -184,15 +184,27 @@ const getNewsByFilter = async (req, res) => {
   }
 };
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, '../../images/');
+  },
+  filename: (req, file, cb) => {
+    console.log("🚀 ~ file:", file)
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage });
+
 const addNews = async (req, res) => {
   try {
     const body = req.body;
+
     const {
       categoryId,
       authorId,
       userId,
       title,
-      image,
       short_description,
       content,
       tagId
@@ -206,8 +218,6 @@ const addNews = async (req, res) => {
         .send();
     }
 
-    console.log(body);
-
     const foundNews = await prisma.News.findFirst({
       where: { title: title },
     });
@@ -219,7 +229,7 @@ const addNews = async (req, res) => {
           authorId: authorId,
           userId: userId,
           title: title,
-          image: image,
+          image: "",
           short_description: short_description,
           content: content,
           created_by: req.user.username,
@@ -269,8 +279,7 @@ const updateNews = async (req, res) => {
       title,
       image,
       short_description,
-      content,
-      updated_by
+      content
     } = body;
 
     if (!title) {
@@ -284,7 +293,7 @@ const updateNews = async (req, res) => {
     const foundNews = await prisma.News.findFirst({
       where: { ID: id, status: 1 },
     });
-    console.log("data: ", foundNews);
+
     if (!foundNews) {
       return new Response(res)
         .setID(0)
@@ -296,22 +305,6 @@ const updateNews = async (req, res) => {
     const checkRecordExist = await prisma.News.findFirst({
       where: { title: title },
     });
-
-    // const storage = multer.diskStorage({
-    //   destination: (req, file, cb) => {
-    //     console.log("🚀 ~ file:", file)
-    //     cb(null, 'images/')
-    //   },
-    //   filename: (req, file, cb) => {
-    //     let filename = uuidv4().slice(-12);
-    //     filename = `${filename}_${file.originalname}`
-    //     cb(null, filename)
-    //   },
-    // })
-
-    // const upload = multer({ storage: storage })
-
-    // console.log("Upload: ", upload.single('file'));
 
     if (checkRecordExist && checkRecordExist?.ID != id) {
       return new Response(res)
@@ -327,7 +320,7 @@ const updateNews = async (req, res) => {
           authorId,
           userId,
           title,
-          image: image,
+          image,
           short_description,
           content,
           updated_by: req.user.username
