@@ -1,0 +1,13 @@
+@import "../_variables.scss";
+.custom-sidebar {
+  background-color: $blue;
+  color: white;
+  width: 285px;
+  .logo {
+    .logo-text {
+      font-weight: bold;
+      font-size: 18px;
+      margin-left: -15px;
+    }
+  }
+}
