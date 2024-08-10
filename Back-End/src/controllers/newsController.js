@@ -34,7 +34,7 @@ const getNews = async (req, res) => {
       const updatedAtFormat = dayjs(news.updated_at);
       news.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
       news.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-      news.image = `http://localhost:8888/api/images/${getImage(news.image)}`
+      news.image = `http://localhost:${process.env.PORT}/api/image/${getImage(news.image)}`;
       result.push(news);
     });
 
