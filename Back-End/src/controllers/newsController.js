@@ -2,7 +2,6 @@ const Response = require("../responseBody/Response");
 const { PrismaClient } = require("@prisma/client");
 const dayjs = require("dayjs");
 const prisma = new PrismaClient();
-const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
 const getNews = async (req, res) => {
@@ -184,17 +183,6 @@ const getNewsByFilter = async (req, res) => {
   }
 };
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, '../../images/');
-  },
-  filename: (req, file, cb) => {
-    console.log("🚀 ~ file:", file)
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
 
 const addNews = async (req, res) => {
   try {
@@ -207,7 +195,8 @@ const addNews = async (req, res) => {
       title,
       short_description,
       content,
-      tagId
+      tagId,
+      image
     } = body;
 
     if (!title) {
@@ -229,7 +218,7 @@ const addNews = async (req, res) => {
           authorId: authorId,
           userId: userId,
           title: title,
-          image: "",
+          image: image,
           short_description: short_description,
           content: content,
           created_by: req.user.username,
@@ -267,6 +256,14 @@ const addNews = async (req, res) => {
       .send();
   }
 };
+
+const uploadImage = async (req, res) => {
+  new Response(res)
+    .setResponse({ filename: req.file.filename })
+    .setID(1)
+    .send();
+
+}
 
 const updateNews = async (req, res) => {
   try {
@@ -388,4 +385,5 @@ module.exports = {
   addNews,
   updateNews,
   deleteNews,
+  uploadImage
 };
