@@ -300,6 +300,9 @@ export default {
           this.newsList = res.data.data.news;
           this.totalItems = res.data.data.pagination.total_record;
           this.loading = false;
+
+          console.log(this.newsList);
+          
         })
         .catch((error) => {
           this.newsList = [];
@@ -321,8 +324,6 @@ export default {
           this.newsList = res.data.data.news;
           this.totalItems = res.data.data.pagination.total_record;
           this.loading = false;
-
-          console.log(this.newsList);
         });
     },
 

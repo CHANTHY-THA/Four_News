@@ -87,7 +87,7 @@
 
               <v-card-subtitle>{{ item.short_description }}</v-card-subtitle>
 
-              <router-link :to="{ name: 'news/detail', params: { id: item.ID } }">
+              <router-link :to="{ name: 'news/detail', params: { id: item.ID } }" style="text-decoration: none;">
                 <v-card-actions>
                   <v-btn class="ms-2" size="small" text="START RADIO" variant="outlined"></v-btn>
                 </v-card-actions>
@@ -116,18 +116,20 @@
       <div class="news">
         <div class="v-row">
           <v-col cols="4" v-for="item in newsList" :key="item">
-            <v-card class="mx-auto news-card" min-width="400" hover>
-              <!-- <v-img class="align-end text-white" height="200" :src="item.src" cover> -->
-              <v-img :src="item.image" :alt="selectedDog" style="" max-height="460px" max-width="460px">
-                <v-card-title style="color: white;">{{ item.title }}</v-card-title>
-              </v-img>
+            <router-link :to="{ name: 'news/detail', params: { id: item.ID } }" style="text-decoration: none;">
+              <v-card class="mx-auto news-card" min-width="400" hover>
+                <!-- <v-img class="align-end text-white" height="200" :src="item.src" cover> -->
+                <v-img :src="item.image" :alt="selectedDog" style="" max-height="460px" max-width="460px">
+                  <v-card-title style="color: white;">{{ item.title }}</v-card-title>
+                </v-img>
 
-              <!-- <v-card-subtitle class="pt-4"> Number 10 </v-card-subtitle> -->
+                <!-- <v-card-subtitle class="pt-4"> Number 10 </v-card-subtitle> -->
 
-              <v-card-text>
-                {{ item.short_description }}
-              </v-card-text>
-            </v-card>
+                <v-card-text>
+                  {{ item.short_description }}
+                </v-card-text>
+              </v-card>
+            </router-link>
           </v-col>
         </div>
       </div>
