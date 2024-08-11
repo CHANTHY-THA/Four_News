@@ -1,118 +1,6 @@
 <template>
   <div class="custom-main-padding">
     <div>
-      <div>
-        <!-- add and edit form -->
-        <v-dialog
-          v-model="dialog"
-          persistent
-          transition="dialog-center-transition"
-          max-width="500px"
-          class="custom-add-dialog"
-        >
-          <template v-slot:activator="{ props }">
-            <v-btn
-              color="info"
-              dark
-              class="mb-2 float-right i-btn-add background-btn-color"
-              v-bind="props"
-            >
-              Add User
-              <!-- <ToolTipMessage message="Add New User"></ToolTipMessage> -->
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title style="padding: 15px" primary-title>
-              {{ formTitle }}
-            </v-card-title>
-            <hr />
-            <!-- <v-card-title>
-            <span class="text-h5">{{ formTitle }}</span>
-          </v-card-title> -->
-            <v-card-text>
-              <v-container>
-                <v-form v-model="form">
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="username"
-                        :rules="[required]"
-                        density="compact"
-                        label="Username"
-                        color="primary"
-                        variant="outlined"
-                      ></v-text-field>
-
-                      <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
-                    </v-col>
-                  </v-row>
-                  <v-row style="margin-top: -15px" v-if="this.user_id === 0">
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="password"
-                        :rules="[required]"
-                        density="compact"
-                        label="Password"
-                        color="primary"
-                        variant="outlined"
-                        type="password"
-                      ></v-text-field>
-
-                      <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
-                    </v-col>
-                  </v-row>
-                  <v-row style="margin-top: -15px">
-                    <v-col cols="12">
-                      <v-select
-                        v-model="role"
-                        :items="roleList"
-                        :item-props="itemProps"
-                        item-value="role"
-                        :rules="[required]"
-                        density="compact"
-                        label="Role"
-                        color="primary"
-                        variant="outlined"
-                      ></v-select>
-
-                      <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
-                    <small :style="{color:colorMessage}">{{message}}</small>
-                  </div> -->
-                    </v-col>
-                  </v-row>
-                </v-form>
-              </v-container>
-            </v-card-text>
-            <v-card-actions
-              style="
-                justify-content: center !important;
-                margin-bottom: 20px;
-                margin-top: -25px;
-              "
-            >
-              <v-btn
-                style="background-color: red; color: white"
-                variant="text"
-                @click="CloseFormAddEdit"
-              >
-                Cancel
-              </v-btn>
-              <v-btn
-                :disabled="!form"
-                class="bg-info"
-                style="background-color: rgb(8, 88, 145); color: white"
-                @click="SaveUser"
-              >
-                Submit
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </div>
       <v-data-table-server
         v-model:items-per-page="itemsPerPage"
         :headers="headers"
@@ -140,13 +28,132 @@
               single-line
               class="me-3 btn-search custom-text-field"
             ></v-text-field>
+            <div>
+              <!-- add and edit form -->
+              <v-dialog
+                v-model="dialog"
+                persistent
+                transition="dialog-center-transition"
+                max-width="500px"
+                class="custom-add-dialog"
+              >
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    color="info"
+                    dark
+                    class="mb-2 float-right i-btn-add background-btn-color"
+                    v-bind="props"
+                  >
+                    Add User
+                    <!-- <ToolTipMessage message="Add New User"></ToolTipMessage> -->
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title style="padding: 15px" primary-title>
+                    {{ formTitle }}
+                  </v-card-title>
+                  <hr />
+                  <!-- <v-card-title>
+            <span class="text-h5">{{ formTitle }}</span>
+          </v-card-title> -->
+                  <v-card-text>
+                    <v-container>
+                      <v-form v-model="form">
+                        <v-row>
+                          <v-col cols="12">
+                            <v-text-field
+                              v-model="username"
+                              :rules="[required]"
+                              density="compact"
+                              label="Username"
+                              color="primary"
+                              variant="outlined"
+                            ></v-text-field>
+
+                            <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
+                    <small :style="{color:colorMessage}">{{message}}</small>
+                  </div> -->
+                          </v-col>
+                        </v-row>
+                        <v-row
+                          style="margin-top: -15px"
+                          v-if="this.user_id === 0"
+                        >
+                          <v-col cols="12">
+                            <v-text-field
+                              v-model="password"
+                              :rules="[required]"
+                              density="compact"
+                              label="Password"
+                              color="primary"
+                              variant="outlined"
+                              type="password"
+                            ></v-text-field>
+
+                            <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
+                    <small :style="{color:colorMessage}">{{message}}</small>
+                  </div> -->
+                          </v-col>
+                        </v-row>
+                        <v-row style="margin-top: -15px">
+                          <v-col cols="12">
+                            <v-select
+                              v-model="role"
+                              :items="roleList"
+                              :item-props="itemProps"
+                              item-value="role"
+                              :rules="[required]"
+                              density="compact"
+                              label="Role"
+                              color="primary"
+                              variant="outlined"
+                            ></v-select>
+
+                            <!-- <div style="margin-top:-40px; margin-left:10px; margin-bottom:-40px;">
+                    <small :style="{color:colorMessage}">{{message}}</small>
+                  </div> -->
+                          </v-col>
+                        </v-row>
+                      </v-form>
+                    </v-container>
+                  </v-card-text>
+                  <v-card-actions
+                    style="
+                      justify-content: center !important;
+                      margin-bottom: 20px;
+                      margin-top: -25px;
+                    "
+                  >
+                    <v-btn
+                      style="background-color: red; color: white"
+                      variant="text"
+                      @click="CloseFormAddEdit"
+                    >
+                      Cancel
+                    </v-btn>
+                    <v-btn
+                      :disabled="!form"
+                      class="bg-info"
+                      style="background-color: rgb(8, 88, 145); color: white"
+                      @click="SaveUser"
+                    >
+                      Submit
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </div>
           </v-toolbar>
         </template>
         <template v-slot:item="{ item }">
           <tr>
             <td>{{ item.ID }}</td>
             <td>{{ item.username }}</td>
-            <!-- <td>{{ item.password }}</td> -->
+            <td>
+              <v-avatar size="40px">
+                <v-img :src="item.profile" :alt="item.profile" style=""></v-img>
+              </v-avatar>
+            </td>
             <td>{{ item.role }}</td>
             <td>{{ item.created_at }}</td>
             <td>
@@ -226,9 +233,9 @@ export default {
   data: () => ({
     headers: [
       { title: "ID", align: "", sortable: false, key: "ID" },
-      { title: "username", sortable: false, key: "username" },
-      // { title: "password", sortable: false, key: "password" },
-      { title: "role", sortable: false, key: "role" },
+      { title: "Username", sortable: false, key: "username" },
+      { title: "Profile", sortable: false, key: "profile" },
+      { title: "Role", sortable: false, key: "role" },
       { title: "CreatedAt", sortable: false, key: "created_at" },
       { title: "Action", sortable: false },
     ],

@@ -68,22 +68,41 @@ function getImage(image) {
   }
 }
 
+const getCountNews = async (req, res) => {
+  try {
+    const countNews = await prisma.News.count({
+      where: {
+        status: 1,
+      },
+    });
+
+    return new Response(res).setResponse(countNews).setID(1).send();
+  } catch (error) {
+    console.log("Error getCountNews:" + err.message);
+    return new Response(res)
+      .setID(0)
+      .setStatusCode(500)
+      .setMessage("Something went wrong.")
+      .send();
+  }
+};
+
 const getNewsByID = async (req, res) => {
 
   try {
-    let id = parseInt(req.params.id);
+    const id = parseInt(req.params.id);
     const foundNews = await prisma.News.findFirst({
+      where: {
+        ID: id,
+        status: 1,
+      },
       include: {
         category: true,
         author: true,
         user: true,
       },
-
-      where: {
-        ID: id,
-        status: 1,
-      },
     });
+
     if (!foundNews) {
       return new Response(res)
         .setID(0)
@@ -95,7 +114,11 @@ const getNewsByID = async (req, res) => {
     const updatedAtFormat = dayjs(foundNews.updated_at);
     foundNews.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
     foundNews.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-    return new Response(res).setResponse(foundNews).setID(1).send();
+    foundNews.image = `http://localhost:${process.env.PORT}/api/image/${getImage(foundNews.image)}`;
+    return new Response(res)
+    .setResponse({ news: foundNews })
+    .setID(1)
+    .send();
   } catch (err) {
     console.log("Error getNewsByID:" + err.message);
     return new Response(res)
@@ -385,6 +408,7 @@ const deleteNews = async (req, res) => {
 
 module.exports = {
   getNews,
+  getCountNews,
   getNewsByID,
   getNewsByFilter,
   addNews,

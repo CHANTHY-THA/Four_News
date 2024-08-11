@@ -18,7 +18,9 @@ const upload = multer({ storage: storage });
 
 newsRoutes.get("/news", newController.getNews);
 
-newsRoutes.get("/singlenews/:id", newController.getNewsByID);
+newsRoutes.get("/countNews", newController.getCountNews);
+
+newsRoutes.get("/newsDetail/:id", newController.getNewsByID);
 
 newsRoutes.get("/news/filter", newController.getNewsByFilter);
 

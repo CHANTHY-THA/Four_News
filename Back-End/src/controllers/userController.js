@@ -20,7 +20,12 @@ const getUsers = async (req, res) => {
         });
 
         const totalRecordPerPage = await prisma.users.findMany({
-            where: { status: 1 },
+            where: {
+                status: 1,
+                NOT: {
+                    role: 'superAdmin'
+                }
+            },
             skip: recordSkip,
             take: limit,
             orderBy: { ID: "desc" },
@@ -31,6 +36,7 @@ const getUsers = async (req, res) => {
             const updatedAtFormat = dayjs(user.updated_at);
             user.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
             user.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+            user.profile = `http://localhost:${process.env.PORT}/api/image/${getProfile(user.profile)}`
             delete user.password;
             result.push(user);
         });
@@ -48,6 +54,25 @@ const getUsers = async (req, res) => {
             .setID(1)
             .send();
     } catch (err) {
+        console.log("Error getUsers:" + err.message);
+        return new Response(res)
+            .setID(0)
+            .setStatusCode(500)
+            .setMessage("Something went wrong.")
+            .send();
+    }
+};
+
+const getCountUser = async (req, res) => {
+    try {
+        const countUser = await prisma.users.count({
+            where: {
+                status: 1,
+            },
+        });
+
+        return new Response(res).setResponse(countUser).setID(1).send();
+    } catch (error) {
         console.log("Error getUsers:" + err.message);
         return new Response(res)
             .setID(0)
@@ -86,6 +111,7 @@ const getUserByID = async (req, res) => {
         const updatedAtFormat = dayjs(foundUser.updated_at);
         foundUser.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
         foundUser.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+        foundUser.profile = `http://localhost:${process.env.PORT}/api/image/${getProfile(foundUser.profile)}`
         delete foundUser.password;
         return new Response(res).setResponse(foundUser).setID(1).send();
     } catch (err) {
@@ -119,6 +145,9 @@ const getUserByFilter = async (req, res) => {
                 // created_by: created_by,
                 // description: { contains: description },
                 status: 1,
+                NOT: {
+                    role: 'superAdmin'
+                }
             },
         });
 
@@ -136,6 +165,7 @@ const getUserByFilter = async (req, res) => {
             const updatedAtFormat = dayjs(user.updated_at);
             user.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
             user.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+            user.profile = `http://localhost:${process.env.PORT}/api/image/${getProfile(user.profile)}`
             delete user.password;
             result.push(user);
         });
@@ -482,8 +512,18 @@ const deleteUser = async (req, res) => {
     }
 };
 
+function getProfile(profile) {
+
+    if (profile === null) {
+        return "default-profile.jpg";
+    } else {
+        return profile;
+    }
+}
+
 module.exports = {
     getUsers,
+    getCountUser,
     addUser,
     updateUsername,
     updatePassword,
