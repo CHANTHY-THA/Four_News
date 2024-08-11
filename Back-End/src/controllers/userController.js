@@ -57,6 +57,25 @@ const getUsers = async (req, res) => {
     }
 };
 
+const getCountUser = async (req, res) => {
+    try {
+        const countUser = await prisma.users.count({
+            where: {
+                status: 1,
+            },
+        });
+
+        return new Response(res).setResponse(countUser).setID(1).send();
+    } catch (error) {
+        console.log("Error getUsers:" + err.message);
+        return new Response(res)
+            .setID(0)
+            .setStatusCode(500)
+            .setMessage("Something went wrong.")
+            .send();
+    }
+};
+
 const getUserByID = async (req, res) => {
     try {
         let id = parseInt(req.params.id);
@@ -484,6 +503,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
     getUsers,
+    getCountUser,
     addUser,
     updateUsername,
     updatePassword,

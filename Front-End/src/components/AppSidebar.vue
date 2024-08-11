@@ -9,9 +9,9 @@
     >
       <div class="logo">
         <div style="margin-left: 15px">
-          <v-list-item :prepend-avatar="com_logo" nav> </v-list-item>
+          <v-list-item :prepend-avatar="require('../assets/four_news.jpg')" nav> </v-list-item>
 
-          <v-text v-if="!rail" class="logo-text">Four News</v-text>
+          <v-text v-if="!rail" class="logo-text ml-1">Four News</v-text>
         </div>
       </div>
       <v-divider></v-divider>
