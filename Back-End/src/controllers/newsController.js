@@ -111,21 +111,22 @@ const getNewsByFilter = async (req, res) => {
   try {
     const result = [];
     const title = req.query.title;
-    const categoryname = req.query.categoryname;
-    const created_by = req.query.created_by;
+    // const categoryname = req.query.categoryname;
+    // const created_by = req.query.created_by;
 
     // pagination
     let page = parseInt(req.query.page) || 1;
     let limit = parseInt(process.env.PAGESIZE);
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
+    let recordSkip = (page - 1) * limit;
 
-    const category = await prisma.categories.findFirst({
-      where: {
-        name: { contains: categoryname },
-        status: 1
-      }
-    })
+    // const category = await prisma.categories.findFirst({
+    //   where: {
+    //     name: { contains: categoryname },
+    //     status: 1
+    //   }
+    // })
 
     // console.log("category ", category);
 
@@ -138,10 +139,13 @@ const getNewsByFilter = async (req, res) => {
 
       where: {
         title: { contains: title },
-        categoryId: category.ID,
-        created_by: created_by,
+        // categoryId: category.ID,
+        // created_by: created_by,
         status: 1,
       },
+      skip: recordSkip,
+      take: limit,
+      orderBy: { updated_at: "desc" },
     });
 
     if (newsList.length == 0) {
@@ -153,12 +157,13 @@ const getNewsByFilter = async (req, res) => {
     }
     const news = newsList.slice(startIndex, endIndex);
 
-    news.forEach((cat) => {
-      const createdAtFormat = dayjs(cat.created_at);
-      const updatedAtFormat = dayjs(cat.updated_at);
-      cat.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
-      cat.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
-      result.push(cat);
+    newsList.forEach((news) => {
+      const createdAtFormat = dayjs(news.created_at);
+      const updatedAtFormat = dayjs(news.updated_at);
+      news.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
+      news.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+      news.image = `http://localhost:${process.env.PORT}/api/image/${getImage(news.image)}`;
+      result.push(news);
     });
 
     const total_page = Math.ceil(newsList.length / limit);

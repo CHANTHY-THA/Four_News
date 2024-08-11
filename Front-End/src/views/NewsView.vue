@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="padding: 20px; background: #e0e0e0; height: 100%">
-      <!-- block rearch -->
+      <!-- block search -->
       <!-- <div>
         <v-row style="margin-top: 10px; margin-left: 10px; margin-right: 10px">
           <v-col cols="4">
@@ -29,8 +29,13 @@
 
       <!-- Data Table New List -->
       <v-card flat class="mt-2" style="width: 100%">
-        <v-card-title class="d-flex align-center pe-2" style="padding: 15px">
-          News List
+        <v-card-title class="d-flex align-center justify-space-between pe-2" style="padding: 15px">
+          <div class="d-flex algin-center" style="width: 40%">
+            News List
+            <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
+              variant="solo-filled" flat hide-details single-line
+              class="me-3 btn-search custom-text-field ml-4"></v-text-field>
+          </div>
           <div>
             <v-dialog v-model="dialog" persistent transition="dialog-center-transition" max-width="800px">
               <template v-slot:activator="{ props }">
@@ -110,26 +115,29 @@
             </v-dialog>
           </div>
         </v-card-title>
+        <hr />
+
         <v-divider></v-divider>
         <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="newsList"
-          :items-length="totalItems" :loading="loading" item-value="name" @update:options="loadItems">
+          :items-length="totalItems" :loading="loading" item-value="name" :search="search" @update:options="loadItems">
           <template v-slot:item="{ item }">
             <tr>
-              <td style="width: 20%">
-                <v-img :src="item.image" :alt="selectedDog" style="" max-height="150px" max-width="200px"></v-img>
+              <td style="width: 20%; padding: 10px; cursor: pointer;">
+                <v-img :src="item.image" :alt="selectedDog" style="" max-height="200px" max-width="200px"></v-img>
               </td>
-              <td style="width: 20%">
+              <td style="width: 30%; padding: 10px;">
                 <h3>{{ item.title }}</h3>
-                <!-- <p style="margin-top: 10px;">{{ item.content }}</p> -->
                 <p style="margin-top: 5px; color: gray">
                   Author by: {{ item.author ? item.author.username : "" }}
                 </p>
+                <p style="margin-top: 5px; color: gray">
+                  Created by: {{ item.created_by }}
+                </p>
+                <p style="margin-top: 5px; color: gray">
+                  Created at: {{ item.created_at }}
+                </p>
               </td>
-              <!-- <td style="width: 20%;">{{ item.content }}</td> -->
-              <td style="width: 20%">{{ item.short_description }}</td>
-              <!-- <td>{{ item.author ? item.author.username : "" }}</td> -->
-              <td>{{ item.created_by }}</td>
-              <td>{{ item.created_at }}</td>
+              <td style="width: 40%; padding: 10px;">{{ item.short_description }}</td>
               <td>
                 <div class="d-flex justify-content-center">
                   <div @click="EditNews(item)" style="
@@ -216,11 +224,7 @@ export default {
     headers: [
       { title: "", align: "", sortable: false },
       { title: "Title", sortable: false, key: "name" },
-      // { title: "Content", sortable: false, key: "content" },
       { title: "Description", sortable: false, key: "description" },
-      // { title: "Author By", sortable: false, key: "author" },
-      { title: "Created By", sortable: false, key: "created_by" },
-      { title: "Created At", sortable: false, key: "created_at" },
       { title: "Action", sortable: false },
     ],
 
@@ -233,9 +237,8 @@ export default {
     short_description: "",
     image: null,
     imageFile: null,
-    // imageUrl: null,
     selectedFile: null,
-    // news_url: process.env.VUE_APP_API_URL + "/images/",
+    search: null,
 
     NewsForm: false,
     dialog: false,
@@ -270,18 +273,36 @@ export default {
     required(v) {
       return !!v || "Field is required";
     },
+
     loadItems({ page, itemsPerPage }) {
       this.page = page;
       this.itemsPerPage = itemsPerPage;
-      if (
-        this.s_name != "" ||
-        this.s_descrition != "" ||
-        this.userSelected != null
-      ) {
-        this.searchCategory();
-      } else {
-        this.getNewsList();
-      }
+      this.searchNews();
+    },
+
+    // search news by filter
+    searchNews() {
+      const params = {
+        page: this.page,
+        itemPerPage: this.itemsPerPage,
+        title: this.search,
+      };
+
+      axios
+        .get(
+          process.env.VUE_APP_API_URL + "/news/filter",
+          { params },
+          { validateStatus: () => false }
+        )
+        .then((res) => {
+          this.newsList = res.data.data.news;
+          this.totalItems = res.data.data.pagination.total_record;
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.newsList = [];
+          console.log(error);
+        });
     },
 
     // Get News List
@@ -301,44 +322,6 @@ export default {
 
           console.log(this.newsList);
         });
-    },
-
-    // search news by filter
-    searchNewsByFilter() {
-      if (
-        this.s_name != "" ||
-        this.s_descrition != "" ||
-        this.userSelected != null
-      ) {
-        if (this.userSelected != null) {
-          this.username =
-            this.userSelected == "All"
-              ? this.userSelected
-              : this.userSelected.username;
-        }
-        let params = {
-          page: this.page,
-          itemPerPage: this.itemsPerPage,
-          name: this.s_name,
-          description: this.s_descrition,
-          created_by: this.username,
-        };
-        axios
-          .get(
-            process.env.VUE_APP_API_URL + "/categories/filter",
-            { params },
-            { validateStatus: () => false }
-          )
-          .then((res) => {
-            this.newsList = res.data.data.categories;
-            this.totalItems = res.data.data.pagination.total_record;
-            this.loading = false;
-          })
-          .catch((error) => {
-            this.newsList = [];
-            console.log(error);
-          });
-      }
     },
 
     // get User List
@@ -430,7 +413,6 @@ export default {
     // select image
     onFileChange(e) {
       const file = e.target.files[0];
-      // this.createBase64Image(selectedImage);
 
       if (file) {
         this.image = URL.createObjectURL(file);
@@ -439,14 +421,6 @@ export default {
         this.image = null;
       }
     },
-
-    // createBase64Image(fileObject) {
-    //   const reader = new FileReader();
-    //   reader.onload = (e) => {
-    //     this.image = e.target.result;
-    //   };
-    //   reader.readAsDataURL(fileObject);
-    // },
 
     // Save News
     async SaveNews() {
@@ -524,15 +498,15 @@ export default {
               this.message = res.data.message;
               this.AddUpdateData(res.data.id);
 
-              // setInterval(() => {
-              //   this.categorySelected = null;
-              //   this.authorSelected = null;
-              //   this.tagSelected = null;
-              //   this.title = null;
-              //   this.content = null;
-              //   this.short_description = null;
-              //   this.image = null;
-              // }, 4000);
+              setInterval(() => {
+                this.categorySelected = null;
+                this.authorSelected = null;
+                this.tagSelected = null;
+                this.title = null;
+                this.content = null;
+                this.short_description = null;
+                this.image = null;
+              }, 4000);
             });
         } catch (err) {
           console.log(err);
