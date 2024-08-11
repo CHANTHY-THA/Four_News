@@ -90,19 +90,19 @@ const getCountNews = async (req, res) => {
 const getNewsByID = async (req, res) => {
 
   try {
-    let id = parseInt(req.params.id);
+    const id = parseInt(req.params.id);
     const foundNews = await prisma.News.findFirst({
+      where: {
+        ID: id,
+        status: 1,
+      },
       include: {
         category: true,
         author: true,
         user: true,
       },
-
-      where: {
-        ID: id,
-        status: 1,
-      },
     });
+
     if (!foundNews) {
       return new Response(res)
         .setID(0)
@@ -115,7 +115,10 @@ const getNewsByID = async (req, res) => {
     foundNews.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
     foundNews.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
     foundNews.image = `http://localhost:${process.env.PORT}/api/image/${getImage(foundNews.image)}`;
-    return new Response(res).setResponse(foundNews).setID(1).send();
+    return new Response(res)
+    .setResponse({ news: foundNews })
+    .setID(1)
+    .send();
   } catch (err) {
     console.log("Error getNewsByID:" + err.message);
     return new Response(res)

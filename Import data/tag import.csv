@@ -1,0 +1,5 @@
+ID,name,status,created_by,updated_by,created_at,updated_at
+1,Music,1,admin,tchanthy,"2024-06-09 12:35:38.279","2024-06-10 09:13:52.555"
+2,Sport,1,tchanthy,NULL,"2024-06-09 16:56:27.465","2024-06-09 16:56:27.465"
+3,"Life and society",1,tchanthy,NULL,"2024-06-10 06:22:50.044","2024-06-10 06:22:50.044"
+4,Technology,1,tchanthy,tchanthy,"2024-06-10 06:25:21.955","2024-06-10 14:07:15.255"

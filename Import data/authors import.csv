@@ -1,0 +1,5 @@
+ID,username,biography,status,created_by,updated_by,created_at,updated_at
+1,Dara,"Profesonal Author",1,admin,tchanthy,"2024-06-09 12:40:22.293","2024-06-10 06:31:42.388"
+2,Lida,"Amazing Author in the world!",1,"Chanry Chhoy",NULL,"2024-06-10 06:30:05.715","2024-06-10 06:30:05.715"
+3,Buna,Author,1,"Chanry Chhoy",NULL,"2024-06-10 06:30:50.154","2024-06-10 06:30:50.154"
+4,Chanthy,"Professional author",1,"Chanthy Tha",NULL,"2024-08-11 08:38:14.561","2024-08-11 08:38:14.561"

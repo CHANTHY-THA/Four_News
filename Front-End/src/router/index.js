@@ -42,7 +42,7 @@ const routes = [
         component: NewsView,
       },
       {
-        path: "news/detail",
+        path: "news/detail/:id",
         name: "news/detail",
         component: NewsDetailView,
       },

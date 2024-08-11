@@ -14,44 +14,52 @@
         </v-col> -->
 
         <v-col cols="3">
-          <v-card class="mx-auto text-center" hover>
-            <v-card-item>
-              <v-card-title> {{ countUser }} </v-card-title>
-            </v-card-item>
-            <v-card-text style="font-size: 16px; font-weight: bold">
-              Users
-            </v-card-text>
-          </v-card>
+          <router-link :to="{ name: 'user' }" style="text-decoration: none;">
+            <v-card class="mx-auto text-center" hover>
+              <v-card-item>
+                <v-card-title> {{ countUser }} </v-card-title>
+              </v-card-item>
+              <v-card-text style="font-size: 16px; font-weight: bold">
+                Users
+              </v-card-text>
+            </v-card>
+          </router-link>
         </v-col>
         <v-col cols="3">
-          <v-card class="mx-auto text-center" hover>
-            <v-card-item>
-              <v-card-title> {{ countAuthor }} </v-card-title>
-            </v-card-item>
-            <v-card-text style="font-size: 16px; font-weight: bold">
-              Authors
-            </v-card-text>
-          </v-card>
+          <router-link :to="{ name: 'author' }" style="text-decoration: none;">
+            <v-card class="mx-auto text-center" hover>
+              <v-card-item>
+                <v-card-title> {{ countAuthor }} </v-card-title>
+              </v-card-item>
+              <v-card-text style="font-size: 16px; font-weight: bold">
+                Authors
+              </v-card-text>
+            </v-card>
+          </router-link>
         </v-col>
         <v-col cols="3">
-          <v-card class="mx-auto text-center" hover>
-            <v-card-item>
-              <v-card-title> {{ countNews }} </v-card-title>
-            </v-card-item>
-            <v-card-text style="font-size: 16px; font-weight: bold">
-              News
-            </v-card-text>
-          </v-card>
+          <router-link :to="{ name: 'news' }" style="text-decoration: none;">
+            <v-card class="mx-auto text-center" hover>
+              <v-card-item>
+                <v-card-title> {{ countNews }} </v-card-title>
+              </v-card-item>
+              <v-card-text style="font-size: 16px; font-weight: bold">
+                News
+              </v-card-text>
+            </v-card>
+          </router-link>
         </v-col>
         <v-col cols="3">
-          <v-card class="mx-auto text-center" hover>
-            <v-card-item>
-              <v-card-title> {{ countCategory }} </v-card-title>
-            </v-card-item>
-            <v-card-text style="font-size: 16px; font-weight: bold">
-              Category
-            </v-card-text>
-          </v-card>
+          <router-link :to="{ name: 'category' }" style="text-decoration: none;">
+            <v-card class="mx-auto text-center" hover>
+              <v-card-item>
+                <v-card-title> {{ countCategory }} </v-card-title>
+              </v-card-item>
+              <v-card-text style="font-size: 16px; font-weight: bold">
+                Category
+              </v-card-text>
+            </v-card>
+          </router-link>
         </v-col>
       </div>
     </section>

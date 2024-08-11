@@ -438,27 +438,29 @@ export default {
         title: this.title,
         content: this.content,
         short_description: this.short_description,
-        image: "",
         updated_at: new Date(),
       };
 
-      console.log(news);
+      // console.log(news);
 
       let token = localStorage.getItem("authToken");
       let headers = {
         Authorization: `Bearer ${token}`,
       };
 
-      await axios
-        .post(
-          process.env.VUE_APP_API_URL + "/uploadImage",
-          formData,
-          { headers },
-          { validateStatus: () => true }
-        )
-        .then((res) => {
-          news.image = res.data.data.filename;
-        });
+      if (this.imageFile) {
+        await axios
+          .post(
+            process.env.VUE_APP_API_URL + "/uploadImage",
+            formData,
+            { headers },
+            { validateStatus: () => true }
+          )
+          .then((res) => {
+            news.image = res.data.data.filename;
+          });
+      }
+
 
       if (this.newsID > 0) {
         try {
@@ -472,16 +474,6 @@ export default {
             .then((res) => {
               this.message = res.data.message;
               this.AddUpdateData(res.data.id);
-
-              // setInterval(() => {
-              //   this.categorySelected = null;
-              //   this.authorSelected = null;
-              //   this.tagSelected = null;
-              //   this.title = null;
-              //   this.content = null;
-              //   this.short_description = null;
-              //   this.image = null;
-              // }, 4000);
             });
         } catch (err) {
           console.log(err);
@@ -499,16 +491,6 @@ export default {
             .then((res) => {
               this.message = res.data.message;
               this.AddUpdateData(res.data.id);
-
-              setInterval(() => {
-                this.categorySelected = null;
-                this.authorSelected = null;
-                this.tagSelected = null;
-                this.title = null;
-                this.content = null;
-                this.short_description = null;
-                this.image = null;
-              }, 4000);
             });
         } catch (err) {
           console.log(err);
