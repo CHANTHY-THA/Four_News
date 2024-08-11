@@ -210,6 +210,7 @@ export default {
       username: "",
       userImage: "",
       com_logo: "",
+      role: "",
     };
   },
   methods: {
@@ -238,6 +239,14 @@ export default {
         .then((res) => {
           this.username = res.data.result.username;
           this.userImage = res.data.result.profile;
+          this.role = res.data.result.role;
+          this.items = this.items.filter((element) => {
+            return (
+              element.path != "/user" ||
+              this.role == "admin" ||
+              this.role == "superAdmin"
+            );
+          });
         });
     },
 
