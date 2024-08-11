@@ -5,6 +5,8 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 authorRoutes.get("/authors", authorController.getAuthors);
 
+authorRoutes.get("/countAuthor", authorController.getCountAuthor);
+
 authorRoutes.get("/allUsers", authorController.getAllUsers);
 
 authorRoutes.get("/author/:id", authorController.getAuthorByID);

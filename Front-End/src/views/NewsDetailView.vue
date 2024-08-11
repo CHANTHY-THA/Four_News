@@ -1,131 +1,15 @@
 <template>
   <div>
     <div style="padding: 20px; background: #e0e0e0; height: 100%">
-      <!-- block search -->
-      <!-- <div>
-        <v-row style="margin-top: 10px; margin-left: 10px; margin-right: 10px">
-          <v-col cols="4">
-            <v-text-field v-model="s_name" label="Name" color="primary" variant="underlined"></v-text-field>
-          </v-col>
-          <v-col cols="4">
-            <v-text-field v-model="s_descrition" label="Description" color="primary"
-              variant="underlined"></v-text-field>
-          </v-col>
-          <v-col cols="4">
-            <v-select :items="userList" item-title="username" v-model="userSelected" label="--Select user--"
-              color="primary" variant="underlined" return-object></v-select>
-          </v-col>
-        </v-row>
-        <v-row style="
-            margin-top: -10px;
-            margin-bottom: 30px;
-            margin-right: 15px;
-            float: right;
-            margin-left: 20px;
-          ">
-          <v-btn @click="searchNewsByFilter" style="cursor: pointer" color="blue">Search</v-btn>
-        </v-row>
-      </div> -->
-
       <!-- Data Table New List -->
       <v-card flat class="mt-2" style="width: 100%">
-        <v-card-title class="d-flex align-center justify-space-between pe-2" style="padding: 15px">
-          <div class="d-flex algin-center" style="width: 40%">
-            News List
-            <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
-              variant="solo-filled" flat hide-details single-line
-              class="me-3 btn-search custom-text-field ml-4"></v-text-field>
-          </div>
-          <div>
-            <v-dialog v-model="dialog" persistent transition="dialog-center-transition" max-width="800px">
-              <template v-slot:activator="{ props }">
-                <v-btn color="info" dark v-bind="props" style="margin-left: 20px">
-                  Create
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title style="padding: 15px" primary-title>
-                  {{ formTitle }}
-                </v-card-title>
-                <hr />
-                <v-card-text>
-                  <v-container>
-                    <v-form v-model="NewsForm">
-                      <v-row>
-                        <v-col cols="6">
-                          <v-text-field v-model="title" :rules="[required]" hide-details="auto" label="Title"
-                            color="primary" variant="outlined"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                          <v-select :items="categoryList" :rules="[required]" item-title="name"
-                            v-model="categorySelected" label="Select category" color="primary" variant="outlined"
-                            persistent-hint return-object single-line></v-select>
-                        </v-col>
-                      </v-row>
-                      <v-row style="margin-top: -15px">
-                        <v-col cols="6">
-                          <v-select :items="authorList" :rules="[required]" item-title="username"
-                            v-model="authorSelected" label="Select author" color="primary" variant="outlined"
-                            persistent-hint return-object single-line></v-select>
-                        </v-col>
-                        <v-col cols="6">
-                          <v-select :items="tagList" :rules="[required]" item-title="name" v-model="tagSelected"
-                            label="Select tag" color="primary" variant="outlined" persistent-hint return-object
-                            single-line></v-select>
-                        </v-col>
-                      </v-row>
-                      <v-row style="margin-top: -15px">
-                        <v-col cols="6">
-                          <v-textarea v-model="content" :rules="[required]" hide-details="auto" label="Content"
-                            color="primary" rows="1" variant="outlined"></v-textarea>
-                        </v-col>
-                        <v-col cols="6">
-                          <v-textarea v-model="short_description" hide-details="auto" label="Description"
-                            color="primary" rows="1" variant="outlined"></v-textarea>
-                        </v-col>
-                      </v-row>
-                      <v-row>
-                        <v-col cols="6">
-                          <input type="file" @change="onFileChange" accept="image/*" />
-                        </v-col>
-                        <v-col cols="6" v-if="image">
-                          <v-img :src="image" max-height="160px" max-width="160px"></v-img>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-                <v-card-actions style="
-                    justify-content: center !important;
-                    margin-bottom: 20px;
-                    margin-top: -25px;
-                  ">
-                  <v-btn style="background-color: gray; color: white" variant="outlined" @click="CloseFormAddEdit">
-                    Cancel
-                  </v-btn>
-                  <v-btn :disabled="!NewsForm" class="bg-info" style="
-                      background-color: rgb(8, 88, 145);
-                      color: white;
-                      margin-left: 5%;
-                    " @click="SaveNews">
-                    Submit
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
-        </v-card-title>
-        <hr />
-
         <v-divider></v-divider>
         <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="newsList"
           :items-length="totalItems" :loading="loading" item-value="name" :search="search" @update:options="loadItems">
           <template v-slot:item="{ item }">
             <tr>
               <td style="width: 20%; padding: 10px; cursor: pointer;">
-                <router-link :to="{ name: 'news/detail', params: { id: item.ID } }">
-                  <v-img :src="item.image" :alt="selectedDog" style="" max-height="200px" max-width="200px"></v-img>
-                </router-link>
+                <v-img :src="item.image" :alt="selectedDog" style="" max-height="200px" max-width="200px"></v-img>
               </td>
               <td style="width: 30%; padding: 10px;">
                 <h3>{{ item.title }}</h3>
@@ -308,22 +192,25 @@ export default {
     },
 
     // Get News List
-    getNewsList() {
-      let token = localStorage.getItem("authToken");
-      let headers = {
-        Authorization: `Bearer ${token}`,
-      };
-      const params = { page: this.page, itemPerPage: this.itemsPerPage };
+    getNewsByID() {
+      // let token = localStorage.getItem("authToken");
+      // let headers = {
+      //   Authorization: `Bearer ${token}`,
+      // };
 
-      axios
-        .get(process.env.VUE_APP_API_URL + "/news", { params, headers })
-        .then((res) => {
-          this.newsList = res.data.data.news;
-          this.totalItems = res.data.data.pagination.total_record;
-          this.loading = false;
+      const params = this.$route.params.id;
 
-          console.log(this.newsList);
-        });
+      console.log("My Params: " ,params);
+
+      // axios
+      //   .get(process.env.VUE_APP_API_URL + "/news/:id", { params, headers })
+      //   .then((res) => {
+      //     this.newsList = res.data.data.news;
+      //     this.totalItems = res.data.data.pagination.total_record;
+      //     this.loading = false;
+
+      //     console.log(this.newsList);
+      //   });
     },
 
     // get User List
@@ -572,9 +459,10 @@ export default {
   // Mounted Method
   mounted() {
     // this.getUser();
-    this.getCategoryList();
-    this.getAuthorList();
-    this.getTagList();
+    // this.getCategoryList();
+    // this.getAuthorList();
+    // this.getTagList();
+    this.getNewsByID();
   },
 };
 </script>

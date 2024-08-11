@@ -5,6 +5,8 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 categoryRoutes.get("/categories", categoryController.getCategories);
 
+categoryRoutes.get("/countCategory", categoryController.getCountCategories);
+
 categoryRoutes.get("/category/:id", categoryController.getCategoryByID);
 
 categoryRoutes.get("/categories/filter", categoryController.getCategoryByFilter);

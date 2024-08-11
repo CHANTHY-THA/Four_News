@@ -4,6 +4,8 @@ const UserController = require("../controllers/userController");
 const authMiddleware = require("../middlewares/authMiddleware");
 userRoutes.get("/users", authMiddleware, UserController.getUsers);
 
+userRoutes.get("/countUser", authMiddleware, UserController.getCountUser);
+
 userRoutes.get("/user/:id", authMiddleware, UserController.getUserByID);
 
 userRoutes.get("/users/filter", authMiddleware, UserController.getUserByFilter);

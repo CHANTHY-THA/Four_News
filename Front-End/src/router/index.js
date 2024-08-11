@@ -12,6 +12,7 @@ import LoginView from "../views/Login.vue";
 import NewsView from "@/views/NewsView.vue";
 import TagView from "../views/TagView.vue";
 import ChangePassword from "../views/ChangePassword.vue";
+import NewsDetailView from "@/views/NewsDetailView.vue";
 
 
 const routes = [
@@ -39,6 +40,11 @@ const routes = [
         path: "news",
         name: "news",
         component: NewsView,
+      },
+      {
+        path: "news/detail",
+        name: "news/detail",
+        component: NewsDetailView,
       },
       {
         path: "user",

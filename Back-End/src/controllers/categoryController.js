@@ -57,6 +57,25 @@ const getCategories = async (req, res) => {
   }
 };
 
+const getCountCategories = async (req, res) => {
+  try {
+      const countCategory = await prisma.categories.count({
+          where: {
+              status: 1,
+          },
+      });
+
+      return new Response(res).setResponse(countCategory).setID(1).send();
+  } catch (error) {
+      console.log("Error getUsers:" + err.message);
+      return new Response(res)
+          .setID(0)
+          .setStatusCode(500)
+          .setMessage("Something went wrong.")
+          .send();
+  }
+};
+
 const getCategoryByID = async (req, res) => {
   try {
     let id = parseInt(req.params.id);
@@ -304,6 +323,7 @@ const deleteCategory = async (req, res) => {
 
 module.exports = {
   getCategories,
+  getCountCategories,
   addCategory,
   updateCategory,
   getCategoryByID,
