@@ -20,7 +20,12 @@ const getUsers = async (req, res) => {
         });
 
         const totalRecordPerPage = await prisma.users.findMany({
-            where: { status: 1 },
+            where: {
+                status: 1,
+                NOT: {
+                    role: 'superAdmin'
+                }
+            },
             skip: recordSkip,
             take: limit,
             orderBy: { ID: "desc" },
@@ -31,6 +36,7 @@ const getUsers = async (req, res) => {
             const updatedAtFormat = dayjs(user.updated_at);
             user.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
             user.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+            user.profile = `http://localhost:${process.env.PORT}/api/image/${getProfile(user.profile)}`
             delete user.password;
             result.push(user);
         });
@@ -86,6 +92,7 @@ const getUserByID = async (req, res) => {
         const updatedAtFormat = dayjs(foundUser.updated_at);
         foundUser.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
         foundUser.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+        foundUser.profile = `http://localhost:${process.env.PORT}/api/image/${getProfile(foundUser.profile)}`
         delete foundUser.password;
         return new Response(res).setResponse(foundUser).setID(1).send();
     } catch (err) {
@@ -119,6 +126,9 @@ const getUserByFilter = async (req, res) => {
                 // created_by: created_by,
                 // description: { contains: description },
                 status: 1,
+                NOT: {
+                    role: 'superAdmin'
+                }
             },
         });
 
@@ -136,6 +146,7 @@ const getUserByFilter = async (req, res) => {
             const updatedAtFormat = dayjs(user.updated_at);
             user.created_at = createdAtFormat.format("DD-MMM-YYYY h:mm A");
             user.updated_at = updatedAtFormat.format("DD-MMM-YYYY h:mm A");
+            user.profile = `http://localhost:${process.env.PORT}/api/image/${getProfile(user.profile)}`
             delete user.password;
             result.push(user);
         });
@@ -481,6 +492,15 @@ const deleteUser = async (req, res) => {
             .send();
     }
 };
+
+function getProfile(profile) {
+
+    if (profile === null) {
+        return "default-profile.jpg";
+    } else {
+        return profile;
+    }
+}
 
 module.exports = {
     getUsers,
