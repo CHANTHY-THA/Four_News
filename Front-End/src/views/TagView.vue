@@ -5,21 +5,25 @@
       <v-row style="margin-top: 10px; margin-left: 10px; margin-right: 10px">
         <v-col cols="6">
           <v-text-field
-            v-model="s_name"
+            v-model="filter.name"
             label="Name"
             color="primary"
             variant="underlined"
+            clearable
+            density="compact"
           ></v-text-field>
         </v-col>
         <v-col cols="6">
           <v-select
+            v-model="filter.created_by"
             :items="userList"
             item-title="username"
-            v-model="userSelected"
+            item-value="username"
             label="--Select user--"
+            clearable
+            density="compact"
             color="primary"
             variant="underlined"
-            return-object
           ></v-select>
         </v-col>
       </v-row>
@@ -32,9 +36,24 @@
           margin-left: 20px;
         "
       >
-        <!-- <v-icon @click="searchTag" size="50" color="blue" style="cursor: pointer;"> mdi-card-search</v-icon> -->
-        <v-btn @click="searchTag" class="background-btn-color">Filter</v-btn>
+        <!-- <v-icon @click="filterTag" size="50" color="blue" style="cursor: pointer;"> mdi-card-search</v-icon> -->
+        <v-btn @click="filterTag" class="background-btn-color">Filter</v-btn>
       </v-row>
+    </div>
+    <div class="px-4 py-2">
+      <template v-for="(item, key) in filter_apply">
+        <v-chip
+          small
+          class="mr-2 mb-1"
+          v-if="item.value"
+          :key="key"
+          closable
+          @click:close="removeFilter(key)"
+        >
+          <strong>{{ item.label }}:</strong>&nbsp;
+          <span class="filter-chip-value">{{ item.value }}</span>
+        </v-chip>
+      </template>
     </div>
 
     <!-- datatable -->
@@ -44,7 +63,19 @@
         style="padding: 15px"
       >
         Tag List
-        <!-- <v-spacer></v-spacer> -->
+        <v-spacer></v-spacer>
+
+        <v-text-field
+          v-model="search"
+          density="compact"
+          label="Search"
+          prepend-inner-icon="mdi-magnify"
+          variant="solo-filled"
+          flat
+          hide-details
+          single-line
+          class="me-3 btn-search custom-text-field"
+        ></v-text-field>
         <!-- add and edit  form -->
         <v-dialog
           v-model="dialog"
@@ -56,9 +87,8 @@
             <v-btn
               color="info"
               dark
-              style="margin-left: 20px"
               v-bind="props"
-              class="background-btn-color"
+              class="background-btn-color me-2"
             >
               Create
             </v-btn>
@@ -113,14 +143,17 @@
         </v-dialog>
       </v-card-title>
       <v-divider></v-divider>
+
       <v-data-table-server
         v-model:items-per-page="itemsPerPage"
         :headers="headers"
         :items="tagList"
         :items-length="totalItems"
         :loading="loading"
+        :search="search"
         item-value="name"
         @update:options="loadItems"
+        class="custom-table"
       >
         <template v-slot:item="{ item }">
           <tr>
@@ -236,7 +269,7 @@ export default {
     snackbar: false,
     dialogDelete: false,
     tagList: [],
-    userList: [["All"]],
+    userList: [],
     loading: true,
     totalItems: 0,
     tag_id: 0,
@@ -245,9 +278,25 @@ export default {
     backgroundColor: "",
     page: 1,
     itemsPerPage: process.env.VUE_APP_ITEM_PER_PAGE,
-    s_name: "",
-    userSelected: null,
+
     username: "",
+
+    filter: {
+      name: null,
+      created_by: null,
+    },
+    filter_apply: {
+      name: {
+        label: "Name",
+        value: null,
+      },
+      created_by: {
+        label: "Created By",
+        value: null,
+      },
+    },
+
+    search: "",
   }),
   computed: {
     formTitle() {
@@ -261,8 +310,8 @@ export default {
     loadItems({ page, itemsPerPage }) {
       this.page = page;
       this.itemsPerPage = itemsPerPage;
-      if (this.s_name != "" || this.userSelected != null) {
-        this.searchTag();
+      if (this.filter.name != null || this.filter.created_by != null) {
+        this.filterTag();
       } else {
         this.getTag();
       }
@@ -272,7 +321,11 @@ export default {
       let headers = {
         Authorization: `Bearer ${token}`,
       };
-      const params = { page: this.page, itemPerPage: this.itemsPerPage };
+      const params = {
+        page: this.page,
+        itemPerPage: this.itemsPerPage,
+        search: this.search,
+      };
       axios
         .get(process.env.VUE_APP_API_URL + "/tags", { headers, params })
         .then((res) => {
@@ -281,14 +334,18 @@ export default {
           this.loading = false;
         });
     },
-    searchTag() {
-      if (this.s_name != "" || this.userSelected != null) {
-        if (this.userSelected != null) {
-          this.username =
-            this.userSelected == "All"
-              ? this.userSelected
-              : this.userSelected.username;
+    filterTag() {
+      if (this.filter.name != null || this.filter.created_by != null) {
+        this.filter_apply.name.value = this.filter.name;
+        this.filter_apply.created_by.value = this.filter.created_by;
+
+        if (this.filter.created_by === null) {
+          this.filter.created_by = "";
         }
+        if (this.filter.name === null) {
+          this.filter.name = "";
+        }
+
         let token = localStorage.getItem("authToken");
         let headers = {
           Authorization: `Bearer ${token}`,
@@ -296,8 +353,9 @@ export default {
         let params = {
           page: this.page,
           itemPerPage: this.itemsPerPage,
-          name: this.s_name,
-          created_by: this.username,
+          name: this.filter.name,
+          created_by: this.filter.created_by,
+          search: this.search,
         };
         axios
           .get(
@@ -329,7 +387,6 @@ export default {
           users.forEach((user) => {
             this.userList.push(user);
           });
-          // this.userSelected = this.userList[0];
         });
     },
     EditTag(tag) {
@@ -425,10 +482,18 @@ export default {
       this.dialogDelete = false;
       this.CloseFormAddEdit();
     },
+    removeFilter(data) {
+      this.filter[data] = null;
+      if (this.filter.name != null || this.filter.created_by != null) {
+        this.filterTag();
+      } else {
+        this.getTag();
+      }
+    },
   },
   mounted() {
     this.getUser();
-    //this.getTag();
+    this.getTag();
   },
 };
 </script>
