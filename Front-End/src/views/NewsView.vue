@@ -29,17 +29,38 @@
 
       <!-- Data Table New List -->
       <v-card flat class="mt-2" style="width: 100%">
-        <v-card-title class="d-flex align-center justify-space-between pe-2" style="padding: 15px">
+        <v-card-title
+          class="d-flex align-center justify-space-between pe-2"
+          style="padding: 15px"
+        >
           <div class="d-flex algin-center" style="width: 40%">
             News List
-            <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
-              variant="solo-filled" flat hide-details single-line
-              class="me-3 btn-search custom-text-field ml-4"></v-text-field>
+            <v-text-field
+              v-model="search"
+              density="compact"
+              label="Search"
+              prepend-inner-icon="mdi-magnify"
+              variant="solo-filled"
+              flat
+              hide-details
+              single-line
+              class="me-3 btn-search custom-text-field ml-4"
+            ></v-text-field>
           </div>
           <div>
-            <v-dialog v-model="dialog" persistent transition="dialog-center-transition" max-width="800px">
+            <v-dialog
+              v-model="dialog"
+              persistent
+              transition="dialog-center-transition"
+              max-width="800px"
+            >
               <template v-slot:activator="{ props }">
-                <v-btn color="info" dark v-bind="props" style="margin-left: 20px">
+                <v-btn
+                  color="info"
+                  dark
+                  v-bind="props"
+                  style="margin-left: 20px"
+                >
                   Create
                 </v-btn>
               </template>
@@ -53,61 +74,126 @@
                     <v-form v-model="NewsForm">
                       <v-row>
                         <v-col cols="6">
-                          <v-text-field v-model="title" :rules="[required]" hide-details="auto" label="Title"
-                            color="primary" variant="outlined"></v-text-field>
+                          <v-text-field
+                            v-model="title"
+                            :rules="[required]"
+                            hide-details="auto"
+                            label="Title"
+                            color="primary"
+                            variant="outlined"
+                          ></v-text-field>
                         </v-col>
                         <v-col cols="6">
-                          <v-select :items="categoryList" :rules="[required]" item-title="name"
-                            v-model="categorySelected" label="Select category" color="primary" variant="outlined"
-                            persistent-hint return-object single-line></v-select>
+                          <v-select
+                            :items="categoryList"
+                            :rules="[required]"
+                            item-title="name"
+                            v-model="categorySelected"
+                            label="Select category"
+                            color="primary"
+                            variant="outlined"
+                            persistent-hint
+                            return-object
+                            single-line
+                          ></v-select>
                         </v-col>
                       </v-row>
                       <v-row style="margin-top: -15px">
                         <v-col cols="6">
-                          <v-select :items="authorList" :rules="[required]" item-title="username"
-                            v-model="authorSelected" label="Select author" color="primary" variant="outlined"
-                            persistent-hint return-object single-line></v-select>
+                          <v-select
+                            :items="authorList"
+                            :rules="[required]"
+                            item-title="username"
+                            v-model="authorSelected"
+                            label="Select author"
+                            color="primary"
+                            variant="outlined"
+                            persistent-hint
+                            return-object
+                            single-line
+                          ></v-select>
                         </v-col>
                         <v-col cols="6">
-                          <v-select :items="tagList" :rules="[required]" item-title="name" v-model="tagSelected"
-                            label="Select tag" color="primary" variant="outlined" persistent-hint return-object
-                            single-line></v-select>
+                          <v-select
+                            :items="tagList"
+                            :rules="[required]"
+                            item-title="name"
+                            v-model="tagSelected"
+                            label="Select tag"
+                            color="primary"
+                            variant="outlined"
+                            persistent-hint
+                            return-object
+                            single-line
+                          ></v-select>
                         </v-col>
                       </v-row>
                       <v-row style="margin-top: -15px">
                         <v-col cols="6">
-                          <v-textarea v-model="content" :rules="[required]" hide-details="auto" label="Content"
-                            color="primary" rows="1" variant="outlined"></v-textarea>
+                          <v-textarea
+                            v-model="content"
+                            :rules="[required]"
+                            hide-details="auto"
+                            label="Content"
+                            color="primary"
+                            rows="1"
+                            variant="outlined"
+                          ></v-textarea>
                         </v-col>
                         <v-col cols="6">
-                          <v-textarea v-model="short_description" hide-details="auto" label="Description"
-                            color="primary" rows="1" variant="outlined"></v-textarea>
+                          <v-textarea
+                            v-model="short_description"
+                            hide-details="auto"
+                            label="Description"
+                            color="primary"
+                            rows="1"
+                            variant="outlined"
+                          ></v-textarea>
                         </v-col>
                       </v-row>
                       <v-row>
                         <v-col cols="6">
-                          <input type="file" @change="onFileChange" accept="image/*" />
+                          <input
+                            type="file"
+                            @change="onFileChange"
+                            accept="image/*"
+                          />
                         </v-col>
                         <v-col cols="6" v-if="image">
-                          <v-img :src="image" max-height="160px" max-width="160px"></v-img>
+                          <v-img
+                            :src="image"
+                            max-height="160px"
+                            max-width="160px"
+                          ></v-img>
                         </v-col>
                       </v-row>
                     </v-form>
                   </v-container>
                 </v-card-text>
-                <v-card-actions style="
+                <v-card-actions
+                  style="
                     justify-content: center !important;
                     margin-bottom: 20px;
                     margin-top: -25px;
-                  ">
-                  <v-btn style="background-color: gray; color: white" variant="outlined" @click="CloseFormAddEdit">
+                  "
+                >
+                  <v-btn
+                    style="background-color: gray; color: white"
+                    variant="outlined"
+                    @click="CloseFormAddEdit"
+                  >
                     Cancel
                   </v-btn>
-                  <v-btn :disabled="!NewsForm" class="bg-info" style="
+                  <v-btn
+                    :disabled="!NewsForm"
+                    class="bg-info"
+                    style="
                       background-color: rgb(8, 88, 145);
                       color: white;
                       margin-left: 5%;
-                    " @click="SaveNews">
+                    "
+                    @click="SaveNews"
+                  >
                     Submit
                   </v-btn>
                 </v-card-actions>
@@ -118,16 +204,32 @@
         <hr />
 
         <v-divider></v-divider>
-        <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="newsList"
-          :items-length="totalItems" :loading="loading" item-value="name" :search="search" @update:options="loadItems">
+        <v-data-table-server
+          v-model:items-per-page="itemsPerPage"
+          :headers="headers"
+          :items="newsList"
+          :items-length="totalItems"
+          :loading="loading"
+          item-value="name"
+          :search="search"
+          @update:options="loadItems"
+        >
           <template v-slot:item="{ item }">
             <tr>
-              <td style="width: 20%; padding: 10px; cursor: pointer;">
-                <router-link :to="{ name: 'news/detail', params: { id: item.ID } }">
-                  <v-img :src="item.image" :alt="selectedDog" style="" max-height="200px" max-width="200px"></v-img>
+              <td style="width: 20%; padding: 10px; cursor: pointer">
+                <router-link
+                  :to="{ name: 'news/detail', params: { id: item.ID } }"
+                >
+                  <v-img
+                    :src="item.image"
+                    :alt="selectedDog"
+                    style=""
+                    max-height="200px"
+                    max-width="200px"
+                  ></v-img>
                 </router-link>
               </td>
-              <td style="width: 30%; padding: 10px;">
+              <td style="width: 30%; padding: 10px">
                 <h3>{{ item.title }}</h3>
                 <p style="margin-top: 5px; color: gray">
                   Author by: {{ item.author ? item.author.username : "" }}
@@ -139,10 +241,14 @@
                   Created at: {{ item.created_at }}
                 </p>
               </td>
-              <td style="width: 40%; padding: 10px;">{{ item.short_description }}</td>
+              <td style="width: 40%; padding: 10px">
+                {{ item.short_description }}
+              </td>
               <td>
                 <div class="d-flex justify-content-center">
-                  <div @click="EditNews(item)" style="
+                  <div
+                    @click="EditNews(item)"
+                    style="
                       margin-right: 5px;
                       background: green;
                       border-radius: 50%;
@@ -152,11 +258,14 @@
                       display: flex;
                       justify-content: center !important;
                       cursor: pointer;
-                    ">
+                    "
+                  >
                     <v-icon size="17" color="white"> mdi-pencil</v-icon>
                     <ToolTipMessage message="Edit Category"></ToolTipMessage>
                   </div>
-                  <div @click="DeleteNewsByID(item)" style="
+                  <div
+                    @click="DeleteNewsByID(item)"
+                    style="
                       background: red;
                       border-radius: 50%;
                       width: 30px;
@@ -166,7 +275,8 @@
                       justify-content: center !important;
                       cursor: pointer;
                       margin-left: 5px;
-                    ">
+                    "
+                  >
                     <v-icon size="17" color="white"> mdi-delete</v-icon>
                   </div>
                 </div>
@@ -190,19 +300,29 @@
               </v-row>
             </v-container>
           </v-card-text>
-          <v-card-actions style="
+          <v-card-actions
+            style="
               justify-content: center !important;
               margin-bottom: 20px;
               margin-top: 0px;
-            ">
-            <v-btn style="background-color: gray; color: white" variant="text" @click="CloseDailogDelete">
+            "
+          >
+            <v-btn
+              style="background-color: gray; color: white"
+              variant="text"
+              @click="CloseDailogDelete"
+            >
               No
             </v-btn>
-            <v-btn class="bg-info" style="
+            <v-btn
+              class="bg-info"
+              style="
                 background-color: rgb(8, 88, 145);
                 color: white;
                 margin-left: 5%;
-              " @click="ConfirmDeleteItem">
+              "
+              @click="ConfirmDeleteItem"
+            >
               Yes
             </v-btn>
           </v-card-actions>
@@ -210,7 +330,11 @@
       </v-dialog>
 
       <!-- Alert message -->
-      <AlertMessage v-model="snackbar" :message="message" :background="backgroundColor" />
+      <AlertMessage
+        v-model="snackbar"
+        :message="message"
+        :background="backgroundColor"
+      />
     </div>
   </div>
 </template>
@@ -302,7 +426,6 @@ export default {
           this.loading = false;
 
           console.log(this.newsList);
-          
         })
         .catch((error) => {
           this.newsList = [];
@@ -461,7 +584,6 @@ export default {
             news.image = res.data.data.filename;
           });
       }
-
 
       if (this.newsID > 0) {
         try {

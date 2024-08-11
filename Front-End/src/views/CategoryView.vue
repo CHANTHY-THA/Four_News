@@ -68,7 +68,7 @@
       </template>
     </div>
     <!-- datatable -->
-    <v-card flat class="mt-2" style="width: 100%">
+    <v-card flat class="mt-2" style="width: 100%; border-radius: 12px">
       <v-card-title
         class="d-flex align-center justify-space-between pe-2"
         style="padding: 15px"
@@ -188,33 +188,13 @@
             <td>{{ item.created_at }}</td>
             <td>
               <div class="d-flex">
-                <div
-                  @click="EditCategory(item)"
-                  style="
-                    margin-right: 5px;
-                    background: green;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
-                >
+                <div @click="EditCategory(item)" class="custom-edit">
                   <v-icon size="17" color="white"> mdi-pencil</v-icon>
                   <ToolTipMessage message="Edit Category"></ToolTipMessage>
                 </div>
                 <div
                   @click="DeleteCategory(item.ID, item.name)"
-                  style="
-                    background: red;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
+                  class="custom-delete"
                 >
                   <v-icon size="17" color="white"> mdi-delete</v-icon>
                 </div>
