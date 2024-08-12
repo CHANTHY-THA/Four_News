@@ -63,6 +63,25 @@ const getAuthors = async (req, res) => {
   }
 };
 
+const getCountAuthor = async (req, res) => {
+  try {
+      const countAuthor = await prisma.authors.count({
+          where: {
+              status: 1,
+          },
+      });
+
+      return new Response(res).setResponse(countAuthor).setID(1).send();
+  } catch (error) {
+      console.log("Error getCountAuthor:" + err.message);
+      return new Response(res)
+          .setID(0)
+          .setStatusCode(500)
+          .setMessage("Something went wrong.")
+          .send();
+  }
+};
+
 const getAuthorByID = async (req, res) => {
   try {
     let id = parseInt(req.params.id);
@@ -339,6 +358,7 @@ const getAllUsers = async (req, res) => {
 
 module.exports = {
   getAuthors,
+  getCountAuthor,
   getAuthorByID,
   getAuthorByFilter,
   addAuthor,

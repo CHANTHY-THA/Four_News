@@ -6,22 +6,30 @@ const prisma = new PrismaClient();
 const getCategories = async (req, res) => {
   try {
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
+    let limit =
+      parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
     let result = [];
     let recordSkip = (page - 1) * limit;
 
+    let search = req.query.search || "";
+    let whereConditions = { status: 1 };
+    if (search) {
+      whereConditions.OR = [
+        { name: { contains: search } },
+        { created_by: { contains: search } },
+      ];
+    }
+
     const totalRecord = await prisma.categories.findMany({
-      where: {
-        status: 1,
-      },
+      where: whereConditions,
     });
-    if(limit == -1){
+    if (limit == -1) {
       recordSkip = 0;
-      limit=totalRecord.length;
+      limit = totalRecord.length;
     }
 
     const totalRecordPerPage = await prisma.categories.findMany({
-      where: { status: 1 },
+      where: whereConditions,
       skip: recordSkip,
       take: limit,
       orderBy: { ID: "desc" },
@@ -54,6 +62,25 @@ const getCategories = async (req, res) => {
       .setStatusCode(500)
       .setMessage("Something went wrong.")
       .send();
+  }
+};
+
+const getCountCategories = async (req, res) => {
+  try {
+      const countCategory = await prisma.categories.count({
+          where: {
+              status: 1,
+          },
+      });
+
+      return new Response(res).setResponse(countCategory).setID(1).send();
+  } catch (error) {
+      console.log("Error getUsers:" + err.message);
+      return new Response(res)
+          .setID(0)
+          .setStatusCode(500)
+          .setMessage("Something went wrong.")
+          .send();
   }
 };
 
@@ -96,28 +123,51 @@ const getCategoryByFilter = async (req, res) => {
     const description = req.query.description;
     // pagination
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
+    let limit =
+      parseInt(req.query.itemPerPage) || parseInt(process.env.PAGESIZE);
     let startIndex = (page - 1) * limit;
     let endIndex = page * limit;
 
-    let categoryList = await prisma.categories.findMany({
-      where: {
-        status: 1,
-      },
-    });
-    if(created != "All" && created != ""){
-      categoryList = categoryList.filter(cat=>cat.created_by==created);
-    }
-    if(name != ""){
-      categoryList = categoryList.filter(cat=>cat.name.toLowerCase().includes(name.toLowerCase()));
-    }
-    if(description != ""){
-      categoryList = categoryList.filter(cat=>cat.description.toLowerCase().includes(description.toLowerCase()));
+    let search = req.query.search || "";
+    let whereConditions = { status: 1 };
+    if (search) {
+      whereConditions.OR = [
+        { name: { contains: search } },
+        { created_by: { contains: search } },
+      ];
     }
 
-    if(limit == -1){
+    if (created) {
+      whereConditions.created_by = { contains: created.toLowerCase() };
+    }
+
+    if (name) {
+      whereConditions.name = { contains: name.toLowerCase() };
+    }
+    if (description) {
+      whereConditions.description = { contains: description.toLowerCase() };
+    }
+
+    let categoryList = await prisma.categories.findMany({
+      where: whereConditions,
+    });
+    // if (created != "All" && created != "") {
+    //   categoryList = categoryList.filter((cat) => cat.created_by == created);
+    // }
+    // if (name != "") {
+    //   categoryList = categoryList.filter((cat) =>
+    //     cat.name.toLowerCase().includes(name.toLowerCase())
+    //   );
+    // }
+    // if (description != "") {
+    //   categoryList = categoryList.filter((cat) =>
+    //     cat.description.toLowerCase().includes(description.toLowerCase())
+    //   );
+    // }
+
+    if (limit == -1) {
       startIndex = 0;
-      limit=categoryList.length;
+      limit = categoryList.length;
       endIndex = limit;
     }
 
@@ -304,6 +354,7 @@ const deleteCategory = async (req, res) => {
 
 module.exports = {
   getCategories,
+  getCountCategories,
   addCategory,
   updateCategory,
   getCategoryByID,

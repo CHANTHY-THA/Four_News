@@ -5,29 +5,35 @@
       <v-row style="margin-top: 10px; margin-left: 10px; margin-right: 10px">
         <v-col cols="4">
           <v-text-field
-            v-model="s_name"
+            v-model="filter.name"
             label="Name"
             color="primary"
             variant="underlined"
+            clearable
+            density="compact"
           ></v-text-field>
         </v-col>
         <v-col cols="4">
           <v-text-field
-            v-model="s_descrition"
+            v-model="filter.description"
             label="Description"
             color="primary"
             variant="underlined"
+            clearable
+            density="compact"
           ></v-text-field>
         </v-col>
         <v-col cols="4">
           <v-select
+            v-model="filter.created_by"
             :items="userList"
             item-title="username"
-            v-model="userSelected"
+            item-value="username"
             label="--Select user--"
+            clearable
+            density="compact"
             color="primary"
             variant="underlined"
-            return-object
           ></v-select>
         </v-col>
       </v-row>
@@ -40,21 +46,47 @@
           margin-left: 20px;
         "
       >
-        <!-- <v-icon @click="searchCategory" size="50" color="blue" style="cursor: pointer;"> mdi-card-search</v-icon> -->
-        <v-btn @click="searchCategory" class="background-btn-color"
+        <!-- <v-icon @click="filterCategory" size="50" color="blue" style="cursor: pointer;"> mdi-card-search</v-icon> -->
+        <v-btn @click="filterCategory" class="background-btn-color"
           >Filter</v-btn
         >
       </v-row>
     </div>
-
+    <div class="px-4 py-2">
+      <template v-for="(item, key) in filter_apply">
+        <v-chip
+          small
+          class="mr-2 mb-1"
+          v-if="item.value"
+          :key="key"
+          closable
+          @click:close="removeFilter(key)"
+        >
+          <strong>{{ item.label }}:</strong>&nbsp;
+          <span class="filter-chip-value">{{ item.value }}</span>
+        </v-chip>
+      </template>
+    </div>
     <!-- datatable -->
-    <v-card flat class="mt-2" style="width: 100%">
+    <v-card flat class="mt-2" style="width: 100%; border-radius: 12px">
       <v-card-title
         class="d-flex align-center justify-space-between pe-2"
         style="padding: 15px"
       >
         Category List
-        <!-- <v-spacer></v-spacer> -->
+        <v-spacer></v-spacer>
+
+        <v-text-field
+          v-model="search"
+          density="compact"
+          label="Search"
+          prepend-inner-icon="mdi-magnify"
+          variant="solo-filled"
+          flat
+          hide-details
+          single-line
+          class="me-3 btn-search custom-text-field"
+        ></v-text-field>
         <!-- add and edit  form -->
         <div>
           <v-dialog
@@ -68,7 +100,6 @@
                 color="info"
                 dark
                 v-bind="props"
-                style="margin-left: 20px"
                 class="background-btn-color"
               >
                 Create
@@ -144,7 +175,9 @@
         :items-length="totalItems"
         :loading="loading"
         item-value="name"
+        :search="search"
         @update:options="loadItems"
+        class="custom-table"
       >
         <template v-slot:item="{ item }">
           <tr>
@@ -155,33 +188,13 @@
             <td>{{ item.created_at }}</td>
             <td>
               <div class="d-flex">
-                <div
-                  @click="EditCategory(item)"
-                  style="
-                    margin-right: 5px;
-                    background: green;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
-                >
+                <div @click="EditCategory(item)" class="custom-edit">
                   <v-icon size="17" color="white"> mdi-pencil</v-icon>
                   <ToolTipMessage message="Edit Category"></ToolTipMessage>
                 </div>
                 <div
                   @click="DeleteCategory(item.ID, item.name)"
-                  style="
-                    background: red;
-                    border-radius: 50%;
-                    width: 30px;
-                    height: 30px;
-                    align-items: center !important;
-                    display: flex;
-                    justify-content: center !important;
-                  "
+                  class="custom-delete"
                 >
                   <v-icon size="17" color="white"> mdi-delete</v-icon>
                 </div>
@@ -263,7 +276,7 @@ export default {
     snackbar: false,
     dialogDelete: false,
     categoryList: [],
-    userList: [["All"]],
+    userList: [],
     loading: true,
     totalItems: 0,
     cat_id: 0,
@@ -276,6 +289,28 @@ export default {
     s_name: "",
     s_descrition: "",
     username: "",
+
+    filter: {
+      name: null,
+      created_by: null,
+      description: null,
+    },
+    filter_apply: {
+      name: {
+        label: "Name",
+        value: null,
+      },
+      created_by: {
+        label: "Created By",
+        value: null,
+      },
+      description: {
+        label: "Description",
+        value: null,
+      },
+    },
+
+    search: "",
   }),
   computed: {
     formTitle() {
@@ -290,11 +325,11 @@ export default {
       this.page = page;
       this.itemsPerPage = itemsPerPage;
       if (
-        this.s_name != "" ||
-        this.s_descrition != "" ||
-        this.userSelected != null
+        this.filter.name != null ||
+        this.filter.description != null ||
+        this.filter.created_by != null
       ) {
-        this.searchCategory();
+        this.filterCategory();
       } else {
         this.getCategory();
       }
@@ -304,7 +339,11 @@ export default {
       let headers = {
         Authorization: `Bearer ${token}`,
       };
-      const params = { page: this.page, itemPerPage: this.itemsPerPage };
+      const params = {
+        page: this.page,
+        itemPerPage: this.itemsPerPage,
+        search: this.search,
+      };
       axios
         .get(process.env.VUE_APP_API_URL + "/categories", { params, headers })
         .then((res) => {
@@ -313,24 +352,32 @@ export default {
           this.loading = false;
         });
     },
-    searchCategory() {
+    filterCategory() {
       if (
-        this.s_name != "" ||
-        this.s_descrition != "" ||
-        this.userSelected != null
+        this.filter.name != null ||
+        this.filter.description != null ||
+        this.filter.created_by != null
       ) {
-        if (this.userSelected != null) {
-          this.username =
-            this.userSelected == "All"
-              ? this.userSelected
-              : this.userSelected.username;
+        this.filter_apply.name.value = this.filter.name;
+        this.filter_apply.created_by.value = this.filter.created_by;
+        this.filter_apply.description.value = this.filter.description;
+
+        if (this.filter.created_by === null) {
+          this.filter.created_by = "";
+        }
+        if (this.filter.name === null) {
+          this.filter.name = "";
+        }
+        if (this.filter.description === null) {
+          this.filter.description = "";
         }
         let params = {
           page: this.page,
           itemPerPage: this.itemsPerPage,
-          name: this.s_name,
-          description: this.s_descrition,
-          created_by: this.username,
+          name: this.filter.name,
+          description: this.filter.description,
+          created_by: this.filter.created_by,
+          search: this.search,
         };
         let token = localStorage.getItem("authToken");
         let headers = {
@@ -465,9 +512,22 @@ export default {
       this.dialogDelete = false;
       this.CloseFormAddEdit();
     },
+    removeFilter(data) {
+      this.filter[data] = null;
+      if (
+        this.filter.name != null ||
+        this.filter.description != null ||
+        this.filter.created_by != null
+      ) {
+        this.filterCategory();
+      } else {
+        this.getCategory();
+      }
+    },
   },
   mounted() {
     this.getUser();
+    this.getCategory();
   },
 };
 </script>
