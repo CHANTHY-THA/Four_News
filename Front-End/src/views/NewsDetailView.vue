@@ -19,7 +19,7 @@
                 <P>Created at: {{ item.created_at }} </P>
               </v-card-subtitle>
 
-              <router-link :to="{ name: 'news' }">
+              <router-link :to="{ name: 'news' }" style="text-decoration: none;">
                 <v-card-actions>
                   <v-btn class="ms-2" size="small" text="Back" variant="outlined"></v-btn>
                 </v-card-actions>
