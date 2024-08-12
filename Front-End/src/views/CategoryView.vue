@@ -276,7 +276,7 @@ export default {
     snackbar: false,
     dialogDelete: false,
     categoryList: [],
-    userList: [["All"]],
+    userList: [],
     loading: true,
     totalItems: 0,
     cat_id: 0,
