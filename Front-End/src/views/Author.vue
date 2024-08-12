@@ -39,9 +39,7 @@
           margin-left: 20px;
         "
       >
-        <v-btn @click="searchCategory" class="background-btn-color"
-          >Filter</v-btn
-        >
+        <v-btn @click="filterAuthor" class="background-btn-color">Filter</v-btn>
       </v-row>
     </div>
     <div class="px-4 py-2">
@@ -311,7 +309,7 @@ export default {
       this.getUser();
       console.log(this.filter.created_by);
       if (this.filter.created_by != null || this.filter.username != null) {
-        this.searchCategory();
+        this.filterAuthor();
       } else {
         this.getAuthor();
       }
@@ -341,7 +339,7 @@ export default {
       });
     },
 
-    searchCategory() {
+    filterAuthor() {
       if (this.filter.created_by != null || this.filter.username != null) {
         this.filter_apply.created_by.value = this.filter.created_by;
         this.filter_apply.username.value = this.filter.username;
@@ -352,7 +350,7 @@ export default {
         if (this.filter.username === null) {
           this.filter.username = "";
         }
-        console.log(this.search);
+        // console.log(this.search);
         let params = {
           page: this.page,
           itemPerPage: this.itemsPerPage,
@@ -488,7 +486,7 @@ export default {
       this.filter[data] = null;
       console.log("filter1", this.filter);
       if (this.filter.created_by != null || this.filter.username != null) {
-        this.searchCategory();
+        this.filterAuthor();
       } else {
         this.getAuthor();
       }
