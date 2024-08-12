@@ -2,7 +2,7 @@ const Response = require("../responseBody/Response");
 const { PrismaClient } = require("@prisma/client");
 const dayjs = require("dayjs");
 const prisma = new PrismaClient();
-const { v4: uuidv4 } = require('uuid');
+// const { v4: uuidv4 } = require('uuid');
 
 const getNews = async (req, res) => {
   try {
@@ -17,12 +17,13 @@ const getNews = async (req, res) => {
       },
     });
 
-    const newsList = await prisma.News.findMany({
+    const newsList = await prisma.news.findMany({
       where: { status: 1 },
       include: {
         category: true,
         author: true,
         user: true,
+        tag: true,
       },
       skip: recordSkip,
       take: limit,
@@ -77,15 +78,15 @@ const getCountNews = async (req, res) => {
     });
 
     return new Response(res).setResponse(countNews).setID(1).send();
-  } catch (error) {
-    console.log("Error getCountNews:" + err.message);
+  } catch (error) { // You had err here, but the variable is named error
+    console.log("Error getCountNews:" + error.message);
     return new Response(res)
       .setID(0)
       .setStatusCode(500)
       .setMessage("Something went wrong.")
       .send();
   }
-};
+}
 
 const getNewsByID = async (req, res) => {
 
@@ -153,11 +154,12 @@ const getNewsByFilter = async (req, res) => {
 
     // console.log("category ", category);
 
-    const newsList = await prisma.News.findMany({
+    const newsList = await prisma.news.findMany({
       include: {
         category: true,
         author: true,
         user: true,
+        tag: true,
       },
 
       where: {
@@ -220,10 +222,10 @@ const addNews = async (req, res) => {
       categoryId,
       authorId,
       userId,
+      tagId,
       title,
       short_description,
       content,
-      tagId,
       image
     } = body;
 
@@ -235,7 +237,7 @@ const addNews = async (req, res) => {
         .send();
     }
 
-    const foundNews = await prisma.News.findFirst({
+    const foundNews = await prisma.news.findFirst({
       where: { title: title },
     });
 
@@ -245,6 +247,7 @@ const addNews = async (req, res) => {
           categoryId: categoryId,
           authorId: authorId,
           userId: userId,
+          tagId: tagId,
           title: title,
           image: image,
           short_description: short_description,
@@ -254,13 +257,13 @@ const addNews = async (req, res) => {
         },
       });
 
-      await prisma.NewsTags.create({
-        data: {
-          newsId: news.ID,
-          tagId: tagId,
-          created_by: news.created_by,
-        },
-      });
+      // await prisma.NewsTags.create({
+      //   data: {
+      //     newsId: news.ID,
+      //     tagId: tagId,
+      //     created_by: news.created_by,
+      //   },
+      // });
 
       return new Response(res)
         .setID(1)
@@ -301,6 +304,7 @@ const updateNews = async (req, res) => {
       categoryId,
       authorId,
       userId,
+      tagId,
       title,
       image,
       short_description,
@@ -344,6 +348,7 @@ const updateNews = async (req, res) => {
           categoryId,
           authorId,
           userId,
+          tagId,
           title,
           image,
           short_description,
