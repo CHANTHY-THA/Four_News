@@ -13,6 +13,7 @@ import NewsView from "@/views/NewsView.vue";
 import TagView from "../views/TagView.vue";
 import ChangePassword from "../views/ChangePassword.vue";
 import NewsDetailView from "@/views/NewsDetailView.vue";
+import MyProfile from "../views/MyProfile.vue";
 
 
 const routes = [
@@ -75,6 +76,15 @@ const routes = [
         path: "/change-password",
         name: "Change Password",
         component: ChangePassword,
+      }, {
+        path: "/change-password",
+        name: "Change Password",
+        component: ChangePassword,
+      },
+      {
+        path: "/myprofile",
+        name: "My Profile",
+        component: MyProfile,
       },
     ],
   },

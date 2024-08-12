@@ -521,6 +521,34 @@ function getProfile(profile) {
     }
 }
 
+const changeProfile = async (req, res) => {
+
+    try {
+
+        const id = req.user.ID;
+        await prisma.users.update({
+            where: { ID: id },
+            data: {
+                profile: req.file.filename,
+            },
+        });
+
+        return new Response(res)
+            .setID(1)
+            .setMessage("Profile updated successfully.")
+            .send();
+    } catch (error) {
+
+        return new Response(res)
+            .setID(0)
+            .setStatusCode(500)
+            .setMessage("Profile updated failed.")
+            .send();
+
+
+    }
+}
+
 module.exports = {
     getUsers,
     getCountUser,
@@ -530,5 +558,7 @@ module.exports = {
     getUserByID,
     deleteUser,
     getUserByFilter,
-    updateUser
+    updateUser,
+    changeProfile
+
 };
