@@ -22,9 +22,21 @@ const getUsers = async (req, res) => {
         const totalRecordPerPage = await prisma.users.findMany({
             where: {
                 status: 1,
-                NOT: {
-                    role: 'superAdmin'
-                }
+                AND: [
+                    {
+
+                        NOT: {
+                            role: 'superAdmin'
+                        }
+                    },
+                    {
+
+                        NOT: {
+                            ID: parseInt(req.user.ID)
+                        }
+                    },
+                ]
+
             },
             skip: recordSkip,
             take: limit,

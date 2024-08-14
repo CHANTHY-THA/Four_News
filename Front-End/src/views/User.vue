@@ -148,12 +148,12 @@
         <template v-slot:item="{ item }">
           <tr>
             <td>{{ item.ID }}</td>
-            <td>{{ item.username }}</td>
             <td>
               <v-avatar size="40px">
                 <v-img :src="item.profile" :alt="item.profile" style=""></v-img>
               </v-avatar>
             </td>
+            <td>{{ item.username }}</td>
             <td>{{ item.role }}</td>
             <td>{{ item.created_at }}</td>
             <td>
@@ -233,8 +233,8 @@ export default {
   data: () => ({
     headers: [
       { title: "ID", align: "", sortable: false, key: "ID" },
-      { title: "Username", sortable: false, key: "username" },
       { title: "Profile", sortable: false, key: "profile" },
+      { title: "Username", sortable: false, key: "username" },
       { title: "Role", sortable: false, key: "role" },
       { title: "CreatedAt", sortable: false, key: "created_at" },
       { title: "Action", sortable: false },
